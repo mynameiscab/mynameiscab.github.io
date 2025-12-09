@@ -1,0 +1,1499 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>课堂随机点名系统</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r110/three.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0c1445 0%, #09103b 100%);
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .control-panel {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 10;
+            background: rgba(8, 24, 72, 0.85);
+            padding: 10px 22px;
+            border-radius: 50px;
+            box-shadow: 0 0 15px rgba(0, 195, 255, 0.5);
+            border: 1px solid rgba(0, 195, 255, 0.3);
+        }
+
+        .control-btn {
+            background: rgba(16, 34, 90, 0.9);
+            color: #e0f7ff;
+            border: none;
+            border-radius: 25px;
+            padding: 8px 16px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            outline: none;
+            position: relative;
+            overflow: hidden;
+            min-width: 90px;
+        }
+
+        .control-btn:hover {
+            background: rgba(22, 68, 170, 0.9);
+            box-shadow: 0 0 15px rgba(0, 195, 255, 0.7);
+            transform: translateY(-2px);
+        }
+
+        #countInput {
+            background: rgba(10, 20, 50, 0.9);
+            color: #e0f7ff;
+            border: 1px solid rgba(0, 195, 255, 0.5);
+            border-radius: 20px;
+            padding: 8px;
+            width: 50px;
+            text-align: center;
+            font-size: 13px;
+            box-shadow: 0 0 8px rgba(0, 195, 255, 0.3) inset;
+        }
+
+        .result-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 20;
+            display: none;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .result-box {
+            background: rgba(8, 24, 72, 0.95);
+            padding: 25px 40px;
+            margin: 10px;
+            border-radius: 12px;
+            text-align: center;
+            color: #64e0ff;
+            font-size: 50px;
+            font-weight: bold;
+            box-shadow: 0 0 30px rgba(0, 150, 255, 0.8);
+            border: 3px solid rgba(100, 224, 255, 0.7);
+            transform: scale(0.8);
+            opacity: 0;
+            animation: appear 0.6s ease-out forwards;
+        }
+
+        @keyframes appear {
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .edit-panel {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(8, 24, 72, 0.95);
+            padding: 25px;
+            border-radius: 15px;
+            width: 85%;
+            max-width: 700px;
+            z-index: 30;
+            display: none;
+            border: 2px solid rgba(0, 195, 255, 0.5);
+            box-shadow: 0 0 35px rgba(0, 100, 255, 0.6);
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .edit-panel h2 {
+            color: #64e0ff;
+            text-align: center;
+            font-size: 26px;
+            margin-bottom: 15px;
+        }
+
+        .class-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        #classSelect {
+            background: rgba(10, 20, 50, 0.9);
+            color: #e0f7ff;
+            border: 1px solid rgba(0, 195, 255, 0.5);
+            border-radius: 20px;
+            padding: 8px 15px;
+            font-size: 14px;
+        }
+
+        .class-manager-btn {
+            background: rgba(16, 34, 90, 0.9);
+            color: #e0f7ff;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 15px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        #nameList {
+            background: rgba(10, 20, 50, 0.9);
+            color: #e0f7ff;
+            border: 1px solid rgba(0, 195, 255, 0.5);
+            border-radius: 10px;
+            padding: 18px;
+            height: 280px;
+            resize: none;
+            font-size: 15px;
+            line-height: 1.7;
+        }
+
+        .edit-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 18px;
+        }
+
+        #saveNames {
+            background: linear-gradient(135deg, #0a9cff 0%, #0062ff 100%);
+            color: white;
+            padding: 10px 28px;
+            border-radius: 25px;
+            border: none;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        #cancelEdit {
+            background: transparent;
+            color: #ff6b6b;
+            padding: 10px 28px;
+            border-radius: 25px;
+            border: 1px solid #ff6b6b;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        .save-success {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(10, 100, 200, 0.9);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            z-index: 100;
+            opacity: 0;
+            animation: fadeInOut 2s ease-in-out;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translate(-50%, -20px); }
+            20% { opacity: 1; transform: translate(-50%, 0); }
+            80% { opacity: 1; transform: translate(-50%, 0); }
+            100% { opacity: 0; transform: translate(-50%, -20px); }
+        }
+
+        .generate-success {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(10, 200, 100, 0.9);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            z-index: 100;
+            opacity: 0;
+            animation: fadeInOut 2s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+    <div id="container"></div>
+    
+    <div class="result-container" id="resultContainer"></div>
+    
+    <div class="edit-panel" id="editPanel">
+        <h2>班级名单管理</h2>
+        
+        <div class="class-controls">
+            <div class="class-selector">
+                <label style="color: #64e0ff;">当前班级：</label>
+                <select id="classSelect"></select>
+            </div>
+            <div class="class-manager">
+                <button id="addClassBtn" class="class-manager-btn">添加班级</button>
+                <button id="deleteClassBtn" class="class-manager-btn">删除班级</button>
+            </div>
+        </div>
+        
+        <p style="color: #64e0ff; text-align: center; margin-bottom: 12px;">每行输入一个姓名</p>
+        <textarea id="nameList"></textarea>
+        <div class="edit-buttons">
+            <button id="saveNames">保存名单</button>
+            <button id="cancelEdit">取消</button>
+        </div>
+    </div>
+    
+    <div class="control-panel">
+        <button id="editBtn" class="control-btn">班级管理</button>
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <button id="countBtn" class="control-btn">抽取人数</button>
+            <input type="number" id="countInput" min="1" max="10" value="1">
+        </div>
+        <button id="startBtn" class="control-btn">开始点名</button>
+        <button id="soundBtn" class="control-btn">音效关</button>
+        <button id="generateBtn" class="control-btn">生成</button>
+        <button id="fullscreenBtn" class="control-btn">全屏</button>
+    </div>
+    
+    <div class="save-success" id="saveSuccess">保存成功</div>
+    <div class="generate-success" id="generateSuccess">生成成功，文件已下载</div>
+
+    <script>
+        // 初始班级数据
+        var initialClasses = {
+            "默认班级": [
+                "张三", "李四", "王五", "赵六", "钱七", "孙八", "周九", "吴十", 
+                "郑十一", "王十二", "李十三", "张十四", "刘十五", "陈十六", "杨十七"
+            ]
+        };
+
+        // Three.js变量
+        var scene, camera, renderer;
+        var nameSprites = [];
+        var nameGroup = new THREE.Group();
+        var isRolling = false;
+        var rollSpeed = 0.5;
+        var animationId;
+
+        // DOM元素
+        var container = document.getElementById('container');
+        var resultContainer = document.getElementById('resultContainer');
+        var editPanel = document.getElementById('editPanel');
+        var nameList = document.getElementById('nameList');
+        var startBtn = document.getElementById('startBtn');
+        var soundBtn = document.getElementById('soundBtn');
+        var fullscreenBtn = document.getElementById('fullscreenBtn');
+        var countInput = document.getElementById('countInput');
+        var classSelect = document.getElementById('classSelect');
+        var addClassBtn = document.getElementById('addClassBtn');
+        var deleteClassBtn = document.getElementById('deleteClassBtn');
+        var saveNamesBtn = document.getElementById('saveNames');
+        var cancelEditBtn = document.getElementById('cancelEdit');
+        var saveSuccess = document.getElementById('saveSuccess');
+        var generateSuccess = document.getElementById('generateSuccess');
+        var editBtn = document.getElementById('editBtn');
+        var generateBtn = document.getElementById('generateBtn');
+        var soundEnabled = false;
+
+        // 班级数据管理
+        var classes = JSON.parse(JSON.stringify(initialClasses));
+        var currentClass = "默认班级";
+        
+        // 无重复抽取管理
+        var remainingStudents = {};
+        var selectedHistory = {};
+
+        // 语音合成对象
+        var speechSynthesis = window.speechSynthesis;
+        var speechUtterance = null;
+
+        // 初始化Three.js场景
+        function initThreeJS() {
+            // 创建场景
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x050f2f);
+            
+            // 创建相机
+            camera = new THREE.PerspectiveCamera(70, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.z = 22;
+            
+            // 创建渲染器
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            container.appendChild(renderer.domElement);
+            
+            // 添加光源
+            var ambientLight = new THREE.AmbientLight(0x404040);
+            scene.add(ambientLight);
+            
+            var pointLight = new THREE.PointLight(0x64e0ff, 2.8);
+            pointLight.position.set(12, 12, 18);
+            scene.add(pointLight);
+            
+            // 创建星星背景
+            createStars();
+            
+            // 添加到场景中
+            scene.add(nameGroup);
+            
+            // 创建名字球体
+            createNameSphere();
+            
+            // 处理窗口大小变化
+            window.addEventListener('resize', onWindowResize);
+            
+            return true;
+        }
+        
+        // 创建星星背景
+        function createStars() {
+            var starsGeometry = new THREE.BufferGeometry();
+            var starsMaterial = new THREE.PointsMaterial({
+                color: 0xffffff,
+                size: 0.2,
+                transparent: true,
+                opacity: 0.8
+            });
+            
+            var starsVertices = [];
+            for (var i = 0; i < 1500; i++) {
+                var x = (Math.random() - 0.5) * 2500;
+                var y = (Math.random() - 0.5) * 2500;
+                var z = (Math.random() - 0.5) * 2500;
+                starsVertices.push(x, y, z);
+            }
+            
+            starsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starsVertices, 3));
+            var stars = new THREE.Points(starsGeometry, starsMaterial);
+            scene.add(stars);
+        }
+        
+        // 创建名字球体
+        function createNameSphere() {
+            // 清空现有的名字
+            while (nameGroup.children.length > 0) {
+                nameGroup.remove(nameGroup.children[0]);
+            }
+            nameSprites = [];
+            
+            var students = classes[currentClass] || [];
+            
+            // 初始化剩余学生名单
+            if (!remainingStudents[currentClass] || remainingStudents[currentClass].length === 0) {
+                remainingStudents[currentClass] = students.slice();
+            }
+            
+            for (var i = 0; i < students.length; i++) {
+                var name = students[i];
+                
+                // 使用斐波那契螺旋算法在球面上均匀分布点
+                var phi = Math.acos(1 - 2 * (i + 0.5) / students.length);
+                var theta = Math.PI * (1 + Math.sqrt(5)) * i;
+                
+                var x = Math.cos(theta) * Math.sin(phi);
+                var y = Math.sin(theta) * Math.sin(phi);
+                var z = Math.cos(phi);
+                
+                // 创建画布来绘制文本
+                var canvas = document.createElement('canvas');
+                canvas.width = 100;
+                canvas.height = 50;
+                var ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.font = 'bold 16px "Microsoft YaHei"';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillStyle = 'rgba(220, 240, 255, 0.95)';
+                ctx.fillText(name, canvas.width / 2, canvas.height / 2);
+                
+                // 创建纹理和精灵
+                var texture = new THREE.CanvasTexture(canvas);
+                var material = new THREE.SpriteMaterial({ map: texture, transparent: true });
+                var sprite = new THREE.Sprite(material);
+                sprite.scale.set(2.5, 1.25, 1);
+                sprite.position.set(x * 9.5, y * 9.5, z * 9.5);
+                
+                nameGroup.add(sprite);
+                nameSprites.push(sprite);
+            }
+        }
+        
+        // 动画循环
+        function animate() {
+            animationId = requestAnimationFrame(animate);
+            
+            // 旋转球体
+            nameGroup.rotation.y += rollSpeed * 0.022;
+            nameGroup.rotation.x += rollSpeed * 0.015;
+            
+            renderer.render(scene, camera);
+        }
+        
+        // 窗口大小变化处理
+        function onWindowResize() {
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        }
+        
+        // 随机选择学生（无重复）
+        function selectRandomStudents(count) {
+            if (!remainingStudents[currentClass] || remainingStudents[currentClass].length === 0) {
+                remainingStudents[currentClass] = classes[currentClass].slice();
+            }
+            
+            var students = remainingStudents[currentClass];
+            var selected = [];
+            var tempStudents = students.slice();
+            
+            var actualCount = Math.min(count, tempStudents.length);
+            
+            for (var i = 0; i < actualCount; i++) {
+                if (tempStudents.length === 0) break;
+                var randomIndex = Math.floor(Math.random() * tempStudents.length);
+                selected.push(tempStudents[randomIndex]);
+                tempStudents.splice(randomIndex, 1);
+            }
+            
+            remainingStudents[currentClass] = tempStudents;
+            return selected;
+        }
+        
+        // 显示选择结果
+        function showSelectedStudents(selectedStudents) {
+            resultContainer.innerHTML = '';
+            
+            selectedStudents.forEach(function(name) {
+                var resultBox = document.createElement('div');
+                resultBox.className = 'result-box';
+                resultBox.textContent = name;
+                resultContainer.appendChild(resultBox);
+            });
+            
+            resultContainer.style.display = 'flex';
+            
+            // 如果音效开启，播报学生姓名
+            if (soundEnabled) {
+                speakStudentNames(selectedStudents);
+            }
+        }
+        
+        // 播报学生姓名
+        function speakStudentNames(selectedStudents) {
+            if (speechSynthesis) {
+                // 停止任何正在进行的播报
+                speechSynthesis.cancel();
+                
+                // 创建播报文本
+                var text = selectedStudents.join('，');
+                
+                // 创建新的语音合成对象
+                speechUtterance = new SpeechSynthesisUtterance(text);
+                
+                // 设置语音为中文，并尝试使用女声
+                speechUtterance.lang = 'zh-CN';
+                speechUtterance.rate = 0.9; // 语速
+                speechUtterance.pitch = 1.2; // 音调
+                speechUtterance.volume = 1.0; // 音量
+                
+                // 尝试设置女声
+                var voices = speechSynthesis.getVoices();
+                var femaleVoice = voices.find(voice => 
+                    voice.lang === 'zh-CN' && 
+                    (voice.name.includes('女') || voice.name.includes('Female') || voice.name.includes('Xiaoxiao'))
+                );
+                
+                if (femaleVoice) {
+                    speechUtterance.voice = femaleVoice;
+                }
+                
+                // 播报
+                speechSynthesis.speak(speechUtterance);
+            }
+        }
+        
+        // 全屏功能
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(function(err) {
+                    console.error('全屏错误: ' + err.message);
+                });
+                fullscreenBtn.textContent = '退出全屏';
+            } else {
+                document.exitFullscreen();
+                fullscreenBtn.textContent = '全屏';
+            }
+        }
+        
+        // 更新班级选择下拉菜单
+        function updateClassSelector() {
+            classSelect.innerHTML = '';
+            Object.keys(classes).forEach(function(className) {
+                var option = document.createElement('option');
+                option.value = className;
+                option.textContent = className;
+                if (className === currentClass) option.selected = true;
+                classSelect.appendChild(option);
+            });
+        }
+        
+        // 添加新班级
+        function addNewClass() {
+            var className = prompt('请输入新班级名称：');
+            if (className && className.trim() !== '') {
+                if (!classes[className]) {
+                    classes[className] = [];
+                    currentClass = className;
+                    localStorage.setItem('classData', JSON.stringify(classes));
+                    updateClassSelector();
+                    nameList.value = '';
+                    createNameSphere();
+                } else {
+                    alert('该班级已存在！');
+                }
+            }
+        }
+        
+        // 删除当前班级
+        function deleteCurrentClass() {
+            if (Object.keys(classes).length <= 1) {
+                alert('至少需要保留一个班级！');
+                return;
+            }
+            
+            if (confirm('确定要删除班级 "' + currentClass + '" 吗？')) {
+                delete classes[currentClass];
+                currentClass = Object.keys(classes)[0];
+                localStorage.setItem('classData', JSON.stringify(classes));
+                updateClassSelector();
+                nameList.value = classes[currentClass].join('\n');
+                createNameSphere();
+            }
+        }
+        
+        // 显示保存成功提示
+        function showSaveSuccess() {
+            saveSuccess.style.display = 'block';
+            saveSuccess.style.opacity = 0;
+            saveSuccess.style.animation = 'none';
+            setTimeout(function() {
+                saveSuccess.style.animation = 'fadeInOut 2s ease-in-out';
+            }, 10);
+        }
+        
+        // 显示生成成功提示
+        function showGenerateSuccess() {
+            generateSuccess.style.display = 'block';
+            generateSuccess.style.opacity = 0;
+            generateSuccess.style.animation = 'none';
+            setTimeout(function() {
+                generateSuccess.style.animation = 'fadeInOut 2s ease-in-out';
+            }, 10);
+        }
+        
+        // 从本地存储加载数据
+        function loadFromStorage() {
+            var savedClassData = localStorage.getItem('classData');
+            if (savedClassData) {
+                try {
+                    classes = JSON.parse(savedClassData);
+                    currentClass = Object.keys(classes)[0];
+                } catch (e) {
+                    classes = JSON.parse(JSON.stringify(initialClasses));
+                }
+            }
+            
+            var savedSoundSetting = localStorage.getItem('soundEnabled');
+            soundEnabled = savedSoundSetting === 'true';
+            soundBtn.textContent = soundEnabled ? '音效开' : '音效关';
+            
+            var savedCount = localStorage.getItem('countNumber');
+            if (savedCount) {
+                countInput.value = savedCount;
+            }
+        }
+        
+        // 生成独立HTML文件功能
+        function generateStandaloneFile() {
+            // 获取当前日期时间
+            var now = new Date();
+            var dateString = now.getFullYear() + '' + 
+                           (now.getMonth() + 1).toString().padStart(2, '0') + '' + 
+                           now.getDate().toString().padStart(2, '0') + '_' + 
+                           now.getHours().toString().padStart(2, '0') + '' + 
+                           now.getMinutes().toString().padStart(2, '0');
+            
+            // 收集当前所有数据
+            var exportData = {
+                classes: classes,
+                currentClass: currentClass,
+                soundEnabled: soundEnabled,
+                countNumber: parseInt(countInput.value) || 1,
+                exportTime: new Date().toISOString()
+            };
+            
+            // 创建包含数据的HTML内容
+            var htmlContent = `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>课堂随机点名系统</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r110/three.min.js"><\/script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0c1445 0%, #09103b 100%);
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .control-panel {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 10;
+            background: rgba(8, 24, 72, 0.85);
+            padding: 10px 22px;
+            border-radius: 50px;
+            box-shadow: 0 0 15px rgba(0, 195, 255, 0.5);
+            border: 1px solid rgba(0, 195, 255, 0.3);
+        }
+
+        .control-btn {
+            background: rgba(16, 34, 90, 0.9);
+            color: #e0f7ff;
+            border: none;
+            border-radius: 25px;
+            padding: 8px 16px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            outline: none;
+            position: relative;
+            overflow: hidden;
+            min-width: 90px;
+        }
+
+        .control-btn:hover {
+            background: rgba(22, 68, 170, 0.9);
+            box-shadow: 0 0 15px rgba(0, 195, 255, 0.7);
+            transform: translateY(-2px);
+        }
+
+        #countInput {
+            background: rgba(10, 20, 50, 0.9);
+            color: #e0f7ff;
+            border: 1px solid rgba(0, 195, 255, 0.5);
+            border-radius: 20px;
+            padding: 8px;
+            width: 50px;
+            text-align: center;
+            font-size: 13px;
+            box-shadow: 0 0 8px rgba(0, 195, 255, 0.3) inset;
+        }
+
+        .result-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 20;
+            display: none;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .result-box {
+            background: rgba(8, 24, 72, 0.95);
+            padding: 25px 40px;
+            margin: 10px;
+            border-radius: 12px;
+            text-align: center;
+            color: #64e0ff;
+            font-size: 50px;
+            font-weight: bold;
+            box-shadow: 0 0 30px rgba(0, 150, 255, 0.8);
+            border: 3px solid rgba(100, 224, 255, 0.7);
+            transform: scale(0.8);
+            opacity: 0;
+            animation: appear 0.6s ease-out forwards;
+        }
+
+        @keyframes appear {
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .edit-panel {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(8, 24, 72, 0.95);
+            padding: 25px;
+            border-radius: 15px;
+            width: 85%;
+            max-width: 700px;
+            z-index: 30;
+            display: none;
+            border: 2px solid rgba(0, 195, 255, 0.5);
+            box-shadow: 0 0 35px rgba(0, 100, 255, 0.6);
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .edit-panel h2 {
+            color: #64e0ff;
+            text-align: center;
+            font-size: 26px;
+            margin-bottom: 15px;
+        }
+
+        .class-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        #classSelect {
+            background: rgba(10, 20, 50, 0.9);
+            color: #e0f7ff;
+            border: 1px solid rgba(0, 195, 255, 0.5);
+            border-radius: 20px;
+            padding: 8px 15px;
+            font-size: 14px;
+        }
+
+        .class-manager-btn {
+            background: rgba(16, 34, 90, 0.9);
+            color: #e0f7ff;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 15px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        #nameList {
+            background: rgba(10, 20, 50, 0.9);
+            color: #e0f7ff;
+            border: 1px solid rgba(0, 195, 255, 0.5);
+            border-radius: 10px;
+            padding: 18px;
+            height: 280px;
+            resize: none;
+            font-size: 15px;
+            line-height: 1.7;
+        }
+
+        .edit-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 18px;
+        }
+
+        #saveNames {
+            background: linear-gradient(135deg, #0a9cff 0%, #0062ff 100%);
+            color: white;
+            padding: 10px 28px;
+            border-radius: 25px;
+            border: none;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        #cancelEdit {
+            background: transparent;
+            color: #ff6b6b;
+            padding: 10px 28px;
+            border-radius: 25px;
+            border: 1px solid #ff6b6b;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        .save-success {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(10, 100, 200, 0.9);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            z-index: 100;
+            opacity: 0;
+            animation: fadeInOut 2s ease-in-out;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translate(-50%, -20px); }
+            20% { opacity: 1; transform: translate(-50%, 0); }
+            80% { opacity: 1; transform: translate(-50%, 0); }
+            100% { opacity: 0; transform: translate(-50%, -20px); }
+        }
+
+        .generate-success {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(10, 200, 100, 0.9);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            z-index: 100;
+            opacity: 0;
+            animation: fadeInOut 2s ease-in-out;
+        }
+    <\/style>
+    <script>
+        // 内嵌数据
+        window.embeddedData = ${JSON.stringify(exportData)};
+    <\/script>
+<\/head>
+<body>
+    <div id="container"><\/div>
+    
+    <div class="result-container" id="resultContainer"><\/div>
+    
+    <div class="edit-panel" id="editPanel">
+        <h2>班级名单管理<\/h2>
+        
+        <div class="class-controls">
+            <div class="class-selector">
+                <label style="color: #64e0ff;">当前班级：<\/label>
+                <select id="classSelect"><\/select>
+            <\/div>
+            <div class="class-manager">
+                <button id="addClassBtn" class="class-manager-btn">添加班级<\/button>
+                <button id="deleteClassBtn" class="class-manager-btn">删除班级<\/button>
+            <\/div>
+        <\/div>
+        
+        <p style="color: #64e0ff; text-align: center; margin-bottom: 12px;">每行输入一个姓名<\/p>
+        <textarea id="nameList"><\/textarea>
+        <div class="edit-buttons">
+            <button id="saveNames">保存名单<\/button>
+            <button id="cancelEdit">取消<\/button>
+        <\/div>
+    <\/div>
+    
+    <div class="control-panel">
+        <button id="editBtn" class="control-btn">班级管理<\/button>
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <button id="countBtn" class="control-btn">抽取人数<\/button>
+            <input type="number" id="countInput" min="1" max="10" value="${exportData.countNumber}">
+        <\/div>
+        <button id="startBtn" class="control-btn">开始点名<\/button>
+        <button id="soundBtn" class="control-btn">${exportData.soundEnabled ? '音效开' : '音效关'}<\/button>
+        <button id="generateBtn" class="control-btn">生成<\/button>
+        <button id="fullscreenBtn" class="control-btn">全屏<\/button>
+    <\/div>
+    
+    <div class="save-success" id="saveSuccess">保存成功<\/div>
+    <div class="generate-success" id="generateSuccess">生成成功，文件已下载<\/div>
+
+    <script>
+        // 初始班级数据
+        var initialClasses = ${JSON.stringify(initialClasses)};
+
+        // Three.js变量
+        var scene, camera, renderer;
+        var nameSprites = [];
+        var nameGroup = new THREE.Group();
+        var isRolling = false;
+        var rollSpeed = 0.5;
+        var animationId;
+
+        // DOM元素
+        var container = document.getElementById('container');
+        var resultContainer = document.getElementById('resultContainer');
+        var editPanel = document.getElementById('editPanel');
+        var nameList = document.getElementById('nameList');
+        var startBtn = document.getElementById('startBtn');
+        var soundBtn = document.getElementById('soundBtn');
+        var fullscreenBtn = document.getElementById('fullscreenBtn');
+        var countInput = document.getElementById('countInput');
+        var classSelect = document.getElementById('classSelect');
+        var addClassBtn = document.getElementById('addClassBtn');
+        var deleteClassBtn = document.getElementById('deleteClassBtn');
+        var saveNamesBtn = document.getElementById('saveNames');
+        var cancelEditBtn = document.getElementById('cancelEdit');
+        var saveSuccess = document.getElementById('saveSuccess');
+        var generateSuccess = document.getElementById('generateSuccess');
+        var editBtn = document.getElementById('editBtn');
+        var generateBtn = document.getElementById('generateBtn');
+        var soundEnabled = ${soundEnabled};
+
+        // 班级数据管理
+        var classes = ${JSON.stringify(classes)};
+        var currentClass = "${currentClass}";
+        
+        // 无重复抽取管理
+        var remainingStudents = {};
+        var selectedHistory = {};
+
+        // 语音合成对象
+        var speechSynthesis = window.speechSynthesis;
+        var speechUtterance = null;
+
+        // 初始化Three.js场景
+        function initThreeJS() {
+            // 创建场景
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x050f2f);
+            
+            // 创建相机
+            camera = new THREE.PerspectiveCamera(70, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.z = 22;
+            
+            // 创建渲染器
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            container.appendChild(renderer.domElement);
+            
+            // 添加光源
+            var ambientLight = new THREE.AmbientLight(0x404040);
+            scene.add(ambientLight);
+            
+            var pointLight = new THREE.PointLight(0x64e0ff, 2.8);
+            pointLight.position.set(12, 12, 18);
+            scene.add(pointLight);
+            
+            // 创建星星背景
+            createStars();
+            
+            // 添加到场景中
+            scene.add(nameGroup);
+            
+            // 创建名字球体
+            createNameSphere();
+            
+            // 处理窗口大小变化
+            window.addEventListener('resize', onWindowResize);
+            
+            return true;
+        }
+        
+        // 创建星星背景
+        function createStars() {
+            var starsGeometry = new THREE.BufferGeometry();
+            var starsMaterial = new THREE.PointsMaterial({
+                color: 0xffffff,
+                size: 0.2,
+                transparent: true,
+                opacity: 0.8
+            });
+            
+            var starsVertices = [];
+            for (var i = 0; i < 1500; i++) {
+                var x = (Math.random() - 0.5) * 2500;
+                var y = (Math.random() - 0.5) * 2500;
+                var z = (Math.random() - 0.5) * 2500;
+                starsVertices.push(x, y, z);
+            }
+            
+            starsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starsVertices, 3));
+            var stars = new THREE.Points(starsGeometry, starsMaterial);
+            scene.add(stars);
+        }
+        
+        // 创建名字球体
+        function createNameSphere() {
+            // 清空现有的名字
+            while (nameGroup.children.length > 0) {
+                nameGroup.remove(nameGroup.children[0]);
+            }
+            nameSprites = [];
+            
+            var students = classes[currentClass] || [];
+            
+            // 初始化剩余学生名单
+            if (!remainingStudents[currentClass] || remainingStudents[currentClass].length === 0) {
+                remainingStudents[currentClass] = students.slice();
+            }
+            
+            for (var i = 0; i < students.length; i++) {
+                var name = students[i];
+                
+                // 使用斐波那契螺旋算法在球面上均匀分布点
+                var phi = Math.acos(1 - 2 * (i + 0.5) / students.length);
+                var theta = Math.PI * (1 + Math.sqrt(5)) * i;
+                
+                var x = Math.cos(theta) * Math.sin(phi);
+                var y = Math.sin(theta) * Math.sin(phi);
+                var z = Math.cos(phi);
+                
+                // 创建画布来绘制文本
+                var canvas = document.createElement('canvas');
+                canvas.width = 200;
+                canvas.height = 100;
+                var ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.font = 'bold 16px "Microsoft YaHei"';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillStyle = 'rgba(220, 240, 255, 0.95)';
+                ctx.fillText(name, canvas.width / 2, canvas.height / 2);
+                
+                // 创建纹理和精灵
+                var texture = new THREE.CanvasTexture(canvas);
+                var material = new THREE.SpriteMaterial({ map: texture, transparent: true });
+                var sprite = new THREE.Sprite(material);
+                sprite.scale.set(2.5, 1.25, 1);
+                sprite.position.set(x * 9.5, y * 9.5, z * 9.5);
+                
+                nameGroup.add(sprite);
+                nameSprites.push(sprite);
+            }
+        }
+        
+        // 动画循环
+        function animate() {
+            animationId = requestAnimationFrame(animate);
+            
+            // 旋转球体
+            nameGroup.rotation.y += rollSpeed * 0.022;
+            nameGroup.rotation.x += rollSpeed * 0.015;
+            
+            renderer.render(scene, camera);
+        }
+        
+        // 窗口大小变化处理
+        function onWindowResize() {
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        }
+        
+        // 随机选择学生（无重复）
+        function selectRandomStudents(count) {
+            if (!remainingStudents[currentClass] || remainingStudents[currentClass].length === 0) {
+                remainingStudents[currentClass] = classes[currentClass].slice();
+            }
+            
+            var students = remainingStudents[currentClass];
+            var selected = [];
+            var tempStudents = students.slice();
+            
+            var actualCount = Math.min(count, tempStudents.length);
+            
+            for (var i = 0; i < actualCount; i++) {
+                if (tempStudents.length === 0) break;
+                var randomIndex = Math.floor(Math.random() * tempStudents.length);
+                selected.push(tempStudents[randomIndex]);
+                tempStudents.splice(randomIndex, 1);
+            }
+            
+            remainingStudents[currentClass] = tempStudents;
+            return selected;
+        }
+        
+        // 显示选择结果
+        function showSelectedStudents(selectedStudents) {
+            resultContainer.innerHTML = '';
+            
+            selectedStudents.forEach(function(name) {
+                var resultBox = document.createElement('div');
+                resultBox.className = 'result-box';
+                resultBox.textContent = name;
+                resultContainer.appendChild(resultBox);
+            });
+            
+            resultContainer.style.display = 'flex';
+            
+            // 如果音效开启，播报学生姓名
+            if (soundEnabled) {
+                speakStudentNames(selectedStudents);
+            }
+        }
+        
+        // 播报学生姓名
+        function speakStudentNames(selectedStudents) {
+            if (speechSynthesis) {
+                // 停止任何正在进行的播报
+                speechSynthesis.cancel();
+                
+                // 创建播报文本
+                var text = selectedStudents.join('，');
+                
+                // 创建新的语音合成对象
+                speechUtterance = new SpeechSynthesisUtterance(text);
+                
+                // 设置语音为中文，并尝试使用女声
+                speechUtterance.lang = 'zh-CN';
+                speechUtterance.rate = 0.9; // 语速
+                speechUtterance.pitch = 1.2; // 音调
+                speechUtterance.volume = 1.0; // 音量
+                
+                // 尝试设置女声
+                var voices = speechSynthesis.getVoices();
+                var femaleVoice = voices.find(voice => 
+                    voice.lang === 'zh-CN' && 
+                    (voice.name.includes('女') || voice.name.includes('Female') || voice.name.includes('Xiaoxiao'))
+                );
+                
+                if (femaleVoice) {
+                    speechUtterance.voice = femaleVoice;
+                }
+                
+                // 播报
+                speechSynthesis.speak(speechUtterance);
+            }
+        }
+        
+        // 全屏功能
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(function(err) {
+                    console.error('全屏错误: ' + err.message);
+                });
+                fullscreenBtn.textContent = '退出全屏';
+            } else {
+                document.exitFullscreen();
+                fullscreenBtn.textContent = '全屏';
+            }
+        }
+        
+        // 更新班级选择下拉菜单
+        function updateClassSelector() {
+            classSelect.innerHTML = '';
+            Object.keys(classes).forEach(function(className) {
+                var option = document.createElement('option');
+                option.value = className;
+                option.textContent = className;
+                if (className === currentClass) option.selected = true;
+                classSelect.appendChild(option);
+            });
+        }
+        
+        // 添加新班级
+        function addNewClass() {
+            var className = prompt('请输入新班级名称：');
+            if (className && className.trim() !== '') {
+                if (!classes[className]) {
+                    classes[className] = [];
+                    currentClass = className;
+                    localStorage.setItem('classData', JSON.stringify(classes));
+                    updateClassSelector();
+                    nameList.value = '';
+                    createNameSphere();
+                } else {
+                    alert('该班级已存在！');
+                }
+            }
+        }
+        
+        // 删除当前班级
+        function deleteCurrentClass() {
+            if (Object.keys(classes).length <= 1) {
+                alert('至少需要保留一个班级！');
+                return;
+            }
+            
+            if (confirm('确定要删除班级 "' + currentClass + '" 吗？')) {
+                delete classes[currentClass];
+                currentClass = Object.keys(classes)[0];
+                localStorage.setItem('classData', JSON.stringify(classes));
+                updateClassSelector();
+                nameList.value = classes[currentClass].join('\\\\n');
+                createNameSphere();
+            }
+        }
+        
+        // 显示保存成功提示
+        function showSaveSuccess() {
+            saveSuccess.style.display = 'block';
+            saveSuccess.style.opacity = 0;
+            saveSuccess.style.animation = 'none';
+            setTimeout(function() {
+                saveSuccess.style.animation = 'fadeInOut 2s ease-in-out';
+            }, 10);
+        }
+        
+        // 显示生成成功提示
+        function showGenerateSuccess() {
+            generateSuccess.style.display = 'block';
+            generateSuccess.style.opacity = 0;
+            generateSuccess.style.animation = 'none';
+            setTimeout(function() {
+                generateSuccess.style.animation = 'fadeInOut 2s ease-in-out';
+            }, 10);
+        }
+        
+        // 事件监听器绑定
+        function setupEventListeners() {
+            // 开始/停止点名
+            startBtn.addEventListener('click', function() {
+                if (isRolling) {
+                    isRolling = false;
+                    this.textContent = '开始点名';
+                    rollSpeed = 0.5;
+                    
+                    var count = parseInt(countInput.value) || 1;
+                    var selectedStudents = selectRandomStudents(Math.min(count, 10));
+                    showSelectedStudents(selectedStudents);
+                } else {
+                    isRolling = true;
+                    this.textContent = '停止点名';
+                    rollSpeed = 2.2;
+                    resultContainer.style.display = 'none';
+                }
+            });
+            
+            // 班级管理按钮
+            editBtn.addEventListener('click', function() {
+                nameList.value = classes[currentClass].join('\\\\n');
+                editPanel.style.display = 'flex';
+            });
+            
+            // 保存名单按钮
+            saveNamesBtn.addEventListener('click', function() {
+                var names = nameList.value.split('\\\\n')
+                    .map(function(name) { return name.trim(); })
+                    .filter(function(name) { return name; });
+                
+                if (names.length > 0) {
+                    classes[currentClass] = names;
+                    localStorage.setItem('classData', JSON.stringify(classes));
+                    
+                    // 重置剩余学生名单
+                    remainingStudents[currentClass] = names.slice();
+                    
+                    // 更新3D球体
+                    createNameSphere();
+                    
+                    // 显示保存成功提示
+                    showSaveSuccess();
+                } else {
+                    alert('名单不能为空！');
+                }
+            });
+            
+            // 取消编辑按钮
+            cancelEditBtn.addEventListener('click', function() {
+                editPanel.style.display = 'none';
+            });
+            
+            // 音效开关按钮
+            soundBtn.addEventListener('click', function() {
+                soundEnabled = !soundEnabled;
+                this.textContent = soundEnabled ? '音效开' : '音效关';
+                localStorage.setItem('soundEnabled', soundEnabled);
+            });
+            
+            // 全屏按钮
+            fullscreenBtn.addEventListener('click', toggleFullscreen);
+            
+            // 保存抽取人数
+            countInput.addEventListener('change', function() {
+                var count = Math.max(1, Math.min(10, parseInt(this.value) || 1));
+                this.value = count;
+                localStorage.setItem('countNumber', count);
+            });
+            
+            // 班级选择变化
+            classSelect.addEventListener('change', function() {
+                currentClass = this.value;
+                nameList.value = classes[currentClass].join('\\\\n');
+                createNameSphere();
+            });
+            
+            // 添加班级按钮
+            addClassBtn.addEventListener('click', addNewClass);
+            
+            // 删除班级按钮
+            deleteClassBtn.addEventListener('click', deleteCurrentClass);
+        }
+        
+        // 初始化整个应用
+        function initApp() {
+            // 初始化Three.js
+            if (!initThreeJS()) {
+                alert("您的浏览器不支持WebGL，部分功能可能无法正常使用");
+            }
+            
+            // 更新班级选择器
+            updateClassSelector();
+            
+            // 绑定事件监听器
+            setupEventListeners();
+            
+            // 开始动画循环
+            animate();
+        }
+        
+        // 启动应用
+        window.addEventListener('load', initApp);
+    <\/script>
+<\/body>
+<\/html>`;
+            
+            // 创建Blob对象并下载
+            var blob = new Blob([htmlContent], { type: 'text/html' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = '课堂点名系统_' + dateString + '.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            // 显示成功提示
+            showGenerateSuccess();
+        }
+        
+        // 事件监听器绑定
+        function setupEventListeners() {
+            // 开始/停止点名
+            startBtn.addEventListener('click', function() {
+                if (isRolling) {
+                    isRolling = false;
+                    this.textContent = '开始点名';
+                    rollSpeed = 0.5;
+                    
+                    var count = parseInt(countInput.value) || 1;
+                    var selectedStudents = selectRandomStudents(Math.min(count, 10));
+                    showSelectedStudents(selectedStudents);
+                } else {
+                    isRolling = true;
+                    this.textContent = '停止点名';
+                    rollSpeed = 2.2;
+                    resultContainer.style.display = 'none';
+                }
+            });
+            
+            // 班级管理按钮
+            editBtn.addEventListener('click', function() {
+                nameList.value = classes[currentClass].join('\n');
+                editPanel.style.display = 'flex';
+            });
+            
+            // 保存名单按钮
+            saveNamesBtn.addEventListener('click', function() {
+                var names = nameList.value.split('\n')
+                    .map(function(name) { return name.trim(); })
+                    .filter(function(name) { return name; });
+                
+                if (names.length > 0) {
+                    classes[currentClass] = names;
+                    localStorage.setItem('classData', JSON.stringify(classes));
+                    
+                    // 重置剩余学生名单
+                    remainingStudents[currentClass] = names.slice();
+                    
+                    // 更新3D球体
+                    createNameSphere();
+                    
+                    // 显示保存成功提示
+                    showSaveSuccess();
+                } else {
+                    alert('名单不能为空！');
+                }
+            });
+            
+            // 取消编辑按钮
+            cancelEditBtn.addEventListener('click', function() {
+                editPanel.style.display = 'none';
+            });
+            
+            // 音效开关按钮
+            soundBtn.addEventListener('click', function() {
+                soundEnabled = !soundEnabled;
+                this.textContent = soundEnabled ? '音效开' : '音效关';
+                localStorage.setItem('soundEnabled', soundEnabled);
+            });
+            
+            // 全屏按钮
+            fullscreenBtn.addEventListener('click', toggleFullscreen);
+            
+            // 生成按钮
+            generateBtn.addEventListener('click', generateStandaloneFile);
+            
+            // 保存抽取人数
+            countInput.addEventListener('change', function() {
+                var count = Math.max(1, Math.min(10, parseInt(this.value) || 1));
+                this.value = count;
+                localStorage.setItem('countNumber', count);
+            });
+            
+            // 班级选择变化
+            classSelect.addEventListener('change', function() {
+                currentClass = this.value;
+                nameList.value = classes[currentClass].join('\n');
+                createNameSphere();
+            });
+            
+            // 添加班级按钮
+            addClassBtn.addEventListener('click', addNewClass);
+            
+            // 删除班级按钮
+            deleteClassBtn.addEventListener('click', deleteCurrentClass);
+        }
+        
+        // 初始化整个应用
+        function initApp() {
+            // 从存储加载数据
+            loadFromStorage();
+            
+            // 初始化Three.js
+            if (!initThreeJS()) {
+                alert("您的浏览器不支持WebGL，部分功能可能无法正常使用");
+            }
+            
+            // 更新班级选择器
+            updateClassSelector();
+            
+            // 绑定事件监听器
+            setupEventListeners();
+            
+            // 开始动画循环
+            animate();
+        }
+        
+        // 启动应用
+        window.addEventListener('load', initApp);
+    </script>
+</body>
+</html>
