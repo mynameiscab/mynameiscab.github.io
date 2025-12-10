@@ -30,24 +30,35 @@
         }
 
         body {
-            /*
-            background-image: url("http://cdn-hsyq-static.shanhutech.cn/bizhi/staticwp/202406/e4a8be711bc3087f80868dcba0091f21--3514658760.jpg");
-            background-repeat: repeat-x;
-            background-attachment: fixed;
-            background-position: center top;
-            */
             background-color: var(--bg-color);
             color: var(--text-color);
             padding: 2rem 0;
             line-height: 1.6;
         }
 
-        /* 容器居中，限制最大宽度 */
         .container {
+            /* 容器居中，限制最大宽度 */
             width: var(--container-width);
             max-width: var(--max-width);
             margin: 0 auto;
             padding: 0 1rem;
+
+            /* 设置容器为全屏 */
+            /*
+            width: 100vw;
+            height: 100vh;
+            */
+            
+            /* 背景图片核心样式 */
+            background-image: url("http://cdn-hsyq-static.shanhutech.cn/bizhi/staticwp/202406/e4a8be711bc3087f80868dcba0091f21--3514658760.jpg"); /* 替换为你的图片地址 */
+            background-repeat: no-repeat; /* 禁止重复 */
+            background-position: center center; /* 水平+垂直居中 */
+            background-size: cover; /* 覆盖容器，保持比例，超出部分裁剪 */
+            background-attachment: fixed; /* 固定背景，滚动时不移动 */
+            /* 兼容旧浏览器 */
+            -webkit-background-size: cover;
+            -moz-background-size: cover;
+            -o-background-size: cover;
         }
 
         /* 标题样式 */
