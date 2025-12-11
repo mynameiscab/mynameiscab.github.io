@@ -1,240 +1,231 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>传送中转站</title>
-    <link rel="icon" href="./icon/index.ico" type="image/x-icon">
-    <link rel="shortcut icon" href="./icon/index.ico" type="image/x-icon">
-    
-    <style>
-        /* 全局样式重置与基础配置 */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: "Microsoft YaHei", sans-serif;
-        }
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>传送中转站</title>
+  <link rel="icon" href="https://mynameiscab.github.io/icon/index.ico" type="image/x-icon">
+  <link rel="shortcut icon" href="https://mynameiscab.github.io/icon/index.ico" type="image/x-icon">
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Microsoft YaHei", "PingFang SC", "Helvetica Neue", sans-serif;
+    }
 
-        /* 自定义CSS变量，方便统一修改样式 */
-        :root {
-            --bg-color: #646464; /* 深色背景，保护视力 */
-            --title-color: cyan;
-            --category-color: yellow;
-            --text-color: #ffffff;
-            --link-bg: #f0f0f0;
-            --link-color: #000000;
-            --link-hover: #4CAF50;
-            --container-width: 90%;
-            --max-width: 1200px;
-        }
+    :root {
+      --body-bg-color: #646464;
+      --primary-accent: cyan;
+      --secondary-accent: yellow;
+      --text-color: #ffffff;
+      --link-bg: #f0f0f0;
+      --link-color: #000000;
+      --link-hover-bg: #4CAF50;
+      --link-hover-color: white;
+      --container-width: 90%;
+      --max-container-width: 1200px;
+      --spacing-sm: 0.6rem;
+      --spacing-md: 1rem;
+      --spacing-lg: 1.5rem;
+      --spacing-xl: 2rem;
+      /* 毛玻璃核心样式 */
+      --glass-bg: rgba(255, 255, 255, 0.2); 
+      --glass-blur: 10px;
+      --glass-radius: 12px;
+      --glass-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      /* 高光相关样式（核心新增） */
+      --glass-border: 1px solid rgba(255, 255, 255, 0.2); /* 浅色边框适配高光 */
+      --glass-highlight-inner: inset 0 1px 0 rgba(255, 255, 255, 0.5),
+                              inset 0 -1px 0 rgba(255, 255, 255, 0.1),
+                              inset 1px 0 0 rgba(255, 255, 255, 0.5),
+                              inset -1px 0 0 rgba(255, 255, 255, 0.1);
+      --glass-highlight-outer: 0 0 15px rgba(255, 255, 255, 0.3); /* 外层柔光高光 */
+    }
 
-        body {
-            /*
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            padding: 2rem 0;
-            line-height: 1.6;
-            */
-            
-            /* 设置容器为全屏 */
-            /*
-            width: 100vw;
-            height: 100vh;
-            */
-            
-            /* 背景图片核心样式 */
-            background-image: url("./image/bg_image.jpg"); /* 替换为你的图片地址 */
-            background-repeat: no-repeat; /* 禁止重复 */
-            background-position: center center; /* 水平+垂直居中 */
-            background-size: cover; /* 覆盖容器，保持比例，超出部分裁剪 */
-            background-attachment: fixed; /* 固定背景，滚动时不移动 */
-            /* 兼容旧浏览器 */
-            -webkit-background-size: cover;
-            -moz-background-size: cover;
-            -o-background-size: cover;
-        }
+    body {
+      background-color: var(--body-bg-color);
+      color: var(--text-color);
+      line-height: 1.6;
+      background-image: url("https://mynameiscab.github.io/image/bg_image.jpg");
+      background-repeat: no-repeat;
+      background-position: center center;
+      background-size: cover;
+      background-attachment: fixed;
+      -webkit-background-size: cover;
+      -moz-background-size: cover;
+      -o-background-size: cover;
+      padding: var(--spacing-xl) 0;
+      min-height: 100vh;
+    }
 
-        .container {
-            /* 容器居中，限制最大宽度 */
-            width: var(--container-width);
-            max-width: var(--max-width);
-            margin: 0 auto;
-            padding: 0 1rem;
-            
-            /* 设置容器为全屏 */
-            /*
-            width: 100vw;
-            height: 100vh;
-            
-            width: 100%;
-            height: 100%;
-            */
-        }
+    main {
+      width: var(--container-width);
+      max-width: var(--max-container-width);
+      margin: 0 auto;
+      padding: var(--spacing-xl) var(--spacing-md);
+      /* 原有毛玻璃样式 */
+      background: var(--glass-bg);
+      backdrop-filter: blur(var(--glass-blur));
+      -webkit-backdrop-filter: blur(var(--glass-blur));
+      border-radius: var(--glass-radius);
+      border: var(--glass-border);
+      /* 高光效果：合并原有阴影 + 内外高光 */
+      box-shadow: var(--glass-shadow), var(--glass-highlight-inner), var(--glass-highlight-outer);
+      /* 渐变背景增强高光质感（可选） */
+      background-image: linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.05) 100%);
+      background-blend-mode: overlay;
+      /* 确保高光层级正确 */
+      position: relative;
+      z-index: 1;
+    }
 
-        /* 标题样式 */
-        .page-title {
-            color: var(--title-color);
-            text-align: center;
-            margin-bottom: 2rem;
-            font-size: 1.8rem;
-        }
+    .page-title {
+      color: var(--primary-accent);
+      text-align: center;
+      margin-bottom: var(--spacing-lg);
+      font-size: clamp(1.5rem, 3vw, 1.8rem);
+    }
 
-        /* 分类标题样式 */
-        .category-title {
-            color: var(--category-color);
-            margin: 1.5rem 0 0.8rem;
-            font-size: 1.4rem;
-            border-left: 4px solid var(--category-color);
-            padding-left: 0.8rem;
-        }
+    .category-title {
+      color: var(--secondary-accent);
+      margin: var(--spacing-lg) 0 var(--spacing-sm);
+      font-size: clamp(1.2rem, 2.5vw, 1.4rem);
+      border-left: 4px solid var(--secondary-accent);
+      padding-left: var(--spacing-md);
+    }
 
-        /* 链接列表样式 */
-        .link-list {
-            list-style: none;
-            padding-left: 1.5rem;
-            margin-bottom: 1rem;
-        }
+    .link-list {
+      list-style: none;
+      padding-left: var(--spacing-lg);
+      margin-bottom: var(--spacing-md);
+    }
 
-        .link-item {
-            margin: 0.6rem 0;
-        }
+    .link-item {
+      margin: var(--spacing-sm) 0;
+    }
 
-        /* 链接样式优化 */
-        .link-item a {
-            display: inline-block;
-            background-color: var(--link-bg);
-            color: var(--link-color);
-            padding: 0.4rem 0.8rem;
-            border-radius: 4px;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            min-width: 120px;
-        }
+    .link-item a {
+      display: inline-block;
+      background-color: var(--link-bg);
+      color: var(--link-color);
+      padding: 0.4rem 0.8rem;
+      border-radius: 4px;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      min-width: 120px;
+      outline: none;
+    }
 
-        .link-item a:hover {
-            background-color: var(--link-hover);
-            color: white;
-            transform: translateX(5px);
-        }
+    .link-item a:hover,
+    .link-item a:focus {
+      background-color: var(--link-hover-bg);
+      color: var(--link-hover-color);
+      transform: translateX(5px);
+      box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.2);
+    }
 
-        /* 底部信息样式 */
-        .footer-info {
-            margin-top: 3rem;
-            text-align: center;
-            color: var(--title-color);
-            font-size: 1.2rem;
-            padding-top: 1rem;
-            border-top: 1px solid var(--title-color);
-        }
+    footer {
+      margin-top: 3rem;
+      text-align: center;
+      color: var(--primary-accent);
+      font-size: 1.2rem;
+      padding-top: var(--spacing-md);
+      border-top: 1px solid var(--primary-accent);
+    }
 
-        /* 响应式适配：移动端优化 */
-        @media (max-width: 768px) {
-            .page-title {
-                font-size: 1.5rem;
-            }
-            .category-title {
-                font-size: 1.2rem;
-            }
-            .link-item a {
-                width: 100%;
-                text-align: center;
-            }
-        }
-    </style>
+    @media (max-width: 768px) {
+      .link-item a {
+        width: 100%;
+        text-align: center;
+      }
+      main {
+        --glass-blur: 8px;
+        padding: var(--spacing-lg) var(--spacing-md);
+        /* 移动端弱化高光，避免刺眼 */
+        --glass-highlight-outer: 0 0 10px rgba(255, 255, 255, 0.2);
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <!-- 页面标题 -->
-        <h1 class="page-title">欢迎来到中转站</h1>
-        <h2 class="page-title">请选择您的目的地</h2>
+  <main>
+    <h1 class="page-title">欢迎来到中转站</h1>
+    <h2 class="page-title">请选择您的目的地</h2>
 
-        <!-- 编程分类 -->
-        <h3 class="category-title">编程</h3>
-        <ul class="link-list">
-            <li class="link-item"><a href="http://csdn.net/" target="_blank">CSDN</a></li>
-            <li class="link-item"><a href="https://www.runoob.com/" target="_blank">菜鸟教程</a></li>
-            <li class="link-item"><a href="http://ybt.ssoier.cn:8088/" target="_blank">信息奥赛一本通(c++)</a></li>
-            <li class="link-item"><a href="https://www.noi.cn/" target="_blank">NOI官网</a></li>
-            <li class="link-item"><a href="https://www.noi.cn/xw/2020-05-13/715542.shtml" target="_blank">NOI Online培训</a></li>
-            <li class="link-item"><a href="https://www.acwing.com/" target="_blank">AcWing</a></li>
-        </ul>
+    <h3 class="category-title">编程</h3>
+    <ul class="link-list">
+      <li class="link-item"><a href="http://csdn.net/" target="_blank" rel="noopener noreferrer" title="CSDN编程社区">CSDN</a></li>
+      <li class="link-item"><a href="https://www.runoob.com/" target="_blank" rel="noopener noreferrer" title="菜鸟教程-编程学习">菜鸟教程</a></li>
+      <li class="link-item"><a href="http://ybt.ssoier.cn:8088/" target="_blank" rel="noopener noreferrer" title="信息奥赛一本通(C++)">信息奥赛一本通(c++)</a></li>
+      <li class="link-item"><a href="https://www.noi.cn/" target="_blank" rel="noopener noreferrer" title="NOI官网">NOI官网</a></li>
+      <li class="link-item"><a href="https://www.noi.cn/xw/2020-05-13/715542.shtml" target="_blank" rel="noopener noreferrer" title="NOI Online培训">NOI Online培训</a></li>
+      <li class="link-item"><a href="https://www.acwing.com/" target="_blank" rel="noopener noreferrer" title="AcWing算法平台">AcWing</a></li>
+    </ul>
 
-        <!-- 地图分类 -->
-        <h3 class="category-title">地图</h3>
-        <ul class="link-list">
-            <li class="link-item"><a href="https://www.airpano.org.cn/" target="_blank">环游世界</a></li>
-        </ul>
+    <h3 class="category-title">地图</h3>
+    <ul class="link-list">
+      <li class="link-item"><a href="https://www.airpano.org.cn/" target="_blank" rel="noopener noreferrer" title="AirPano环游世界">环游世界</a></li>
+    </ul>
 
-        <!-- 安全分类 -->
-        <h3 class="category-title">安全</h3>
-        <ul class="link-list">
-            <li class="link-item"><a href="https://urlsec.qq.com/index.html" target="_blank">腾讯安全-网址安全中心</a></li>
-            <li class="link-item"><a href="https://urlsec.qq.com/check.html" target="_blank">腾讯安全-网址安全检测</a></li>
-            <li class="link-item"><a href="http://aspack.com/" target="_blank">ASPack官网</a></li>
-        </ul>
+    <h3 class="category-title">安全</h3>
+    <ul class="link-list">
+      <li class="link-item"><a href="https://urlsec.qq.com/index.html" target="_blank" rel="noopener noreferrer" title="腾讯安全-网址安全中心">腾讯安全-网址安全中心</a></li>
+      <li class="link-item"><a href="https://urlsec.qq.com/check.html" target="_blank" rel="noopener noreferrer" title="腾讯安全-网址安全检测">腾讯安全-网址安全检测</a></li>
+      <li class="link-item"><a href="http://aspack.com/" target="_blank" rel="noopener noreferrer" title="ASPack官网">ASPack官网</a></li>
+    </ul>
 
-        <!-- 其他分类 -->
-        <h3 class="category-title">其他</h3>
-        <ul class="link-list">
-            <li class="link-item"><a href="http://baidu.com/" target="_blank">百度</a></li>
-            <li class="link-item"><a href="http://fanyi.baidu.com/" target="_blank">百度翻译</a></li>
-            <li class="link-item"><a href="http://iciba.com/" target="_blank">金山词霸</a></li>
-            <li class="link-item"><a href="http://caixb.ysepan.com/" target="_blank">Wellcome</a></li>
-        </ul>
+    <h3 class="category-title">其他</h3>
+    <ul class="link-list">
+      <li class="link-item"><a href="http://baidu.com/" target="_blank" rel="noopener noreferrer" title="百度搜索引擎">百度</a></li>
+      <li class="link-item"><a href="http://fanyi.baidu.com/" target="_blank" rel="noopener noreferrer" title="百度翻译">百度翻译</a></li>
+      <li class="link-item"><a href="http://iciba.com/" target="_blank" rel="noopener noreferrer" title="金山词霸">金山词霸</a></li>
+      <li class="link-item"><a href="http://caixb.ysepan.com/" target="_blank" rel="noopener noreferrer" title="Wellcome">Wellcome</a></li>
+    </ul>
 
-        <!-- 视频分类 -->
-        <h3 class="category-title">视频</h3>
-        <ul class="link-list">
-            <li class="link-item"><a href="https://www.ixigua.com/" target="_blank">西瓜视频</a></li>
-            <li class="link-item"><a href="https://v.qq.com/" target="_blank">腾讯视频</a></li>
-            <li class="link-item"><a href="https://haokan.baidu.com/?fr=pc_pz" target="_blank">好看视频</a></li>
-            <li class="link-item"><a href="https://www.bilibili.com/" target="_blank">BiliBili</a></li>
-        </ul>
+    <h3 class="category-title">视频</h3>
+    <ul class="link-list">
+      <li class="link-item"><a href="https://www.ixigua.com/" target="_blank" rel="noopener noreferrer" title="西瓜视频">西瓜视频</a></li>
+      <li class="link-item"><a href="https://v.qq.com/" target="_blank" rel="noopener noreferrer" title="腾讯视频">腾讯视频</a></li>
+      <li class="link-item"><a href="https://haokan.baidu.com/?fr=pc_pz" target="_blank" rel="noopener noreferrer" title="好看视频">好看视频</a></li>
+      <li class="link-item"><a href="https://www.bilibili.com/" target="_blank" rel="noopener noreferrer" title="哔哩哔哩">BiliBili</a></li>
+    </ul>
 
-        <!-- 游戏分类 -->
-        <h3 class="category-title">游戏</h3>
-        <ul class="link-list">
-            <li class="link-item"><a href="https://golly.sourceforge.net/" target="_blank">golly官网</a></li>
-            <li class="link-item"><a href="https://teamspeak.com/zh-CN/" target="_blank">Team Speak专业团队交流工具</a></li>
-        </ul>
+    <h3 class="category-title">游戏</h3>
+    <ul class="link-list">
+      <li class="link-item"><a href="https://golly.sourceforge.net/" target="_blank" rel="noopener noreferrer" title="Golly官网">golly官网</a></li>
+      <li class="link-item"><a href="https://teamspeak.com/zh-CN/" target="_blank" rel="noopener noreferrer" title="Team Speak团队交流工具">Team Speak专业团队交流工具</a></li>
+    </ul>
 
-        <!-- 在线游戏分类 -->
-        <h3 class="category-title">在线游戏</h3>
-        <ul class="link-list">
-            <li class="link-item"><a href="./otherhtml/SweepBOON/SweepBOON.html" target="_blank">扫雷</a></li>
-            <li class="link-item"><a href="./otherhtml/RUSblock/RUSblock.html" target="_blank">俄罗斯方块</a></li>
-            <li class="link-item"><a href="./otherhtml/runjump/runjump.html" target="_blank">单人跑酷</a></li>
-            <li class="link-item"><a href="./otherhtml/fivechess/fivechess.html" target="_blank">五子棋</a></li>
-        </ul>
+    <h3 class="category-title">在线游戏</h3>
+    <ul class="link-list">
+      <li class="link-item"><a href="./otherhtml/SweepBOON/SweepBOON.html" target="_blank" rel="noopener noreferrer" title="扫雷小游戏">扫雷</a></li>
+      <li class="link-item"><a href="./otherhtml/RUSblock/RUSblock.html" target="_blank" rel="noopener noreferrer" title="俄罗斯方块小游戏">俄罗斯方块</a></li>
+      <li class="link-item"><a href="./otherhtml/runjump/runjump.html" target="_blank" rel="noopener noreferrer" title="单人跑酷小游戏">单人跑酷</a></li>
+      <li class="link-item"><a href="./otherhtml/fivechess/fivechess.html" target="_blank" rel="noopener noreferrer" title="五子棋小游戏">五子棋</a></li>
+    </ul>
 
-        <!-- 在线工具分类 -->
-        <h3 class="category-title">工具</h3>
-        <ul class="link-list">
-            <li class="link-item"><a href="./otherhtml/duckRunner/duckRunner.html" target="_blank">鸭子赛跑</a></li>
-            <li class="link-item"><a href="./otherhtml/randName/randName.html" target="_blank">随机点名</a></li>
-        </ul>
-        
-        <!-- 下载站分类 -->
-        <h3 class="category-title">下载站</h3>
-        <ul class="link-list">
-            <!--
-            <li class="link-item"><a href="./download/download.html" target="_blank">现成的PC端BT种子</a></li>
-            <li class="link-item"><a href="./phonedownload/phonedownload.html" target="_blank">现成的手机App下载</a></li>
-            -->
-            <li class="link-item"><a href="https://pirate-bays.net/" target="_blank">海盗湾</a></li>
-            <li class="link-item"><a href="http://rarbg.to/index80.php" target="_blank">RARGB全球最全电影下载网站</a></li>
-            <li class="link-item"><a href="https://fitgirl-repacks.site/" target="_blank">fitgirl破解游戏下载</a></li>
-            <li class="link-item"><a href="https://vsetop.org/" target="_blank">vestop俄罗斯下载站</a></li>
-            <li class="link-item"><a href="https://igg-games.com/" target="_blank">IGG单机游戏</a></li>
-        </ul>
+    <h3 class="category-title">工具</h3>
+    <ul class="link-list">
+      <li class="link-item"><a href="./otherhtml/duckRunner/duckRunner.html" target="_blank" rel="noopener noreferrer" title="鸭子赛跑工具">鸭子赛跑</a></li>
+      <li class="link-item"><a href="./otherhtml/randName/randName.html" target="_blank" rel="noopener noreferrer" title="随机点名工具">随机点名</a></li>
+    </ul>
+    
+    <h3 class="category-title">下载站</h3>
+    <ul class="link-list">
+      <li class="link-item"><a href="https://pirate-bays.net/" target="_blank" rel="noopener noreferrer" title="海盗湾下载站">海盗湾</a></li>
+      <li class="link-item"><a href="http://rarbg.to/index80.php" target="_blank" rel="noopener noreferrer" title="RARGB电影下载">RARGB全球最全电影下载网站</a></li>
+      <li class="link-item"><a href="https://fitgirl-repacks.site/" target="_blank" rel="noopener noreferrer" title="FitGirl破解游戏下载">fitgirl破解游戏下载</a></li>
+      <li class="link-item"><a href="https://vsetop.org/" target="_blank" rel="noopener noreferrer" title="Vestop俄罗斯下载站">vestop俄罗斯下载站</a></li>
+      <li class="link-item"><a href="https://igg-games.com/" target="_blank" rel="noopener noreferrer" title="IGG单机游戏下载">IGG单机游戏</a></li>
+    </ul>
 
-        <!-- 底部信息 -->
-        <div class="footer-info">
-            <p>中转站建设中</p>
-            <p>欢迎在caixb.ysepan.com中留言</p>
-            <p>此网站为学习网页前端时所做</p>
-        </div>
-    </div>
+    <footer>
+      <p>中转站建设中</p>
+      <p>欢迎在caixb.ysepan.com中留言</p>
+      <p>此网站为学习网页前端时所做</p>
+    </footer>
+  </main>
 </body>
 </html>
