@@ -1,0 +1,512 @@
+<!--
+================================================================================
+📋 更新日志 (CHANGELOG)
+================================================================================
+v1.7.5 - 2026-07-19  【Bug修复】
+  ✦ 切换模式后折叠面板子字段（事实/假设/未知）数据丢失
+  ✦ 修复 setData 恢复数据时包含所有子字段
+
+
+v1.7.4 - 2026-07-19  【性能优化】
+  ✦ 暗色主题CSS精简 + 按需加载
+  ✦ 加载速度从25秒优化至<2秒
+
+
+v1.7.3 - 2026-07-19  【性能优化】
+  ✦ 优化初始化加载速度
+
+
+v1.7.2 - 2026-07-19  【界面优化】
+  ● 调换"问题类型判断"和"信息可信度分析"位置
+  ● 同步调整报告生成和思维导图顺序
+
+
+v1.7.1 - 2026-07-19  【样式优化】
+  ● 报告摘要标签与值区分度提升
+
+
+v1.7.0 - 2026-07-19  【新增功能】
+  + 报告顶部增加分析摘要区域
+
+
+v1.6.5 - 2026-07-19  【Bug修复】
+  ✦ 切换模式时，专业/儿童选项相互映射转换
+  ✦ Toast显示时长调整为1.5秒
+
+v1.6.4 - 2026-07-19  【新增功能】
+  + 暗色主题
+================================================================================
+当前版本: v1.7.5  状态: ✅ 稳定版
+================================================================================
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>结构化问题分析训练器 v1.7.5</title>
+<style>
+*{box-sizing:border-box}body{font-family:"Microsoft YaHei",Arial,sans-serif;background:#f5f5f5;margin:0;padding:8px;transition:background .3s,color .3s}.container{max-width:900px;margin:auto;background:#fff;padding:12px;border-radius:10px;transition:background .3s}h1{text-align:center;font-size:23px;margin:5px 0 10px}.version-badge{font-size:12px;color:#999;font-weight:400;margin-left:8px;transition:color .3s}details{margin:6px 0}summary{cursor:pointer;font-weight:700;background:#eef6ff;padding:7px;border-radius:6px;transition:background .3s,color .3s}summary:hover{background:#dde8f5}button{background:#4a90e2;color:#fff;border:0;border-radius:6px;padding:8px 12px;margin:3px;font-size:14px;cursor:pointer;transition:background .2s}button:hover{background:#357abd}button.danger{background:#e74c3c}button.danger:hover{background:#c0392b}button.success{background:#27ae60}button.success:hover{background:#1e8449}.mode,.work-mode{text-align:center;padding:6px}.mode label,.work-mode label{margin:0 8px;cursor:pointer}.action-flow{display:flex;flex-direction:column;align-items:center}.node{width:250px;padding:7px;margin:3px;text-align:center;background:#eef6ff;border:2px solid #4a90e2;border-radius:12px;transition:background .3s,border-color .3s,color .3s}.arrow{font-size:18px;color:#4a90e2;transition:color .3s}.example{background:#fff8e8;padding:7px;border-radius:8px;transition:background .3s}.step{background:#fafafa;border-left:3px solid #4a90e2;padding:7px;margin:5px 0;transition:background .3s,border-color .3s}.title{display:block;margin-bottom:4px;font-weight:700}textarea,select{width:100%;padding:7px;font-size:14px;border:1px solid #ccc;border-radius:5px;transition:background .3s,color .3s,border-color .3s}textarea{height:65px;resize:vertical}textarea::placeholder{color:#999;font-size:13px;transition:color .3s}select{height:36px;background:#fff}#typeInfo{font-size:13px;color:#666;margin-top:5px;line-height:1.4;transition:color .3s}
+.collapsible-section{background:#f8f9fa;border-radius:6px;margin-top:6px;border:1px solid #e0e0e0;transition:background .3s,border-color .3s}.collapsible-section summary{background:#f0f2f5;padding:6px 10px;font-weight:700;font-size:14px;color:#333;transition:background .3s,color .3s}.collapsible-section summary:hover{background:#e8eaed}.collapsible-section .info-box{padding:8px 10px}.collapsible-section .info-box b{display:block;margin-top:6px;margin-bottom:3px;font-size:13px;color:#555;transition:color .3s}.collapsible-section .info-box b:first-child{margin-top:0}.collapsible-section textarea{height:50px;font-size:13px}
+.progress-container{margin:10px 0 15px;padding:10px 12px;background:#f8f9fa;border-radius:8px;border:1px solid #e8e8e8;transition:background .3s,border-color .3s}.progress-bar{width:100%;height:8px;background:#e8e8e8;border-radius:4px;overflow:hidden;transition:background .3s}.progress-fill{height:100%;width:0;border-radius:4px;transition:width .4s ease,background .3s ease}.progress-text{font-size:13px;color:#666;text-align:right;margin-top:4px;transition:color .3s}
+.learning-panel{background:#eef6ff;border-radius:8px;padding:10px;margin-top:8px;transition:background .3s}.learning-title{font-size:18px;font-weight:700;color:#357abd;margin-bottom:8px;transition:color .3s}.learning-menu{display:flex;flex-direction:column}.learning-menu button{background:#fff;color:#357abd;border:1px solid #4a90e2;transition:background .3s,color .3s,border-color .3s}.learning-menu button:hover{background:#e8f0fe}.learning-content{margin-top:10px;background:#fff;padding:10px;border-radius:8px;line-height:1.6;transition:background .3s,color .3s}.learning-content h3{margin-top:0}.learning-example{background:#fff8dc;padding:8px;border-radius:6px;margin-top:8px;transition:background .3s}
+.report{margin-top:10px;padding:10px;background:#eef6ff;border-radius:8px;font-size:14px;line-height:1.5;transition:background .3s}.report-item{margin-bottom:12px}.report-item span{display:block;font-weight:400;margin-bottom:4px}.quote{margin-top:5px;padding:8px 10px;border-left:4px solid #d8c08a;background:#fff8dc;font-weight:700;line-height:1.6;border-radius:4px;transition:background .3s,border-color .3s}.hidden{display:none}
+.toast{position:fixed;top:20px;right:20px;background:#333;color:#fff;padding:12px 20px;border-radius:8px;z-index:9999;opacity:0;transition:opacity .3s;font-size:14px;max-width:300px}.toast.show{opacity:1}.toast.success{background:#27ae60}.toast.error{background:#e74c3c}.toast.warning{background:#f39c12}.export-buttons{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.theme-toggle{position:fixed;bottom:20px;right:20px;background:#4a90e2;color:#fff;border:0;border-radius:50%;width:50px;height:50px;font-size:22px;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.2);z-index:100;transition:transform .3s,background .3s,color .3s;display:flex;align-items:center;justify-content:center}.theme-toggle:hover{transform:scale(1.1)}
+/* 报告摘要 */
+.report-summary{background:#fff;border-radius:8px;padding:16px 18px;margin-bottom:16px;border:2px solid #4a90e2;box-shadow:0 1px 4px rgba(74,144,226,.12);transition:background .3s,border-color .3s}
+.report-summary-title{font-size:17px;font-weight:700;color:#4a90e2;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid #e8eef6}
+.report-summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 24px}
+.report-summary-grid .item{display:flex;flex-direction:column;padding:2px 0}
+.report-summary-grid .item .label{font-size:11px;font-weight:600;color:#4a90e2;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
+.report-summary-grid .item .value{font-size:14px;color:#222;font-weight:500;word-break:break-all;padding:3px 10px;background:#f0f6ff;border-radius:4px;line-height:1.6}
+.report-summary-grid .item.full{grid-column:1/-1}
+@media(max-width:600px){.report-summary-grid{grid-template-columns:1fr;gap:6px}body{padding:5px}.container{padding:8px}h1{font-size:21px}button{width:100%;margin:3px 0}.node{width:90%}textarea{height:75px}.collapsible-section textarea{height:45px}.progress-container{padding:8px 10px}.progress-text{font-size:12px}.theme-toggle{width:40px;height:40px;font-size:18px;bottom:15px;right:15px}}
+</style>
+</head>
+<body>
+
+<button class="theme-toggle" onclick="app.toggleTheme()" title="切换暗色主题">🌓</button>
+
+<div class="container">
+<h1>结构化问题分析训练器 <span class="version-badge">v1.7.5</span></h1>
+<div id="toast" class="toast"></div>
+
+<details>
+<summary>查看行动指南</summary>
+<div class="work-mode">
+<b>工作模式：</b>
+<label><input type="radio" name="workMode" value="analysis" onclick="app.switchWorkMode('analysis')">分析模式</label>
+<label><input type="radio" name="workMode" value="learning" onclick="app.switchWorkMode('learning')">学习模式</label>
+</div>
+<div id="analysisMode">
+<div class="mode">
+<label><input type="radio" name="mode" value="child" onclick="app.switchMode('child')">儿童模式</label>
+<label><input type="radio" name="mode" value="pro" onclick="app.switchMode('pro')">专业模式</label>
+</div>
+<div id="mindmap" class="action-flow"></div>
+</div>
+<div id="learningMode" class="learning-panel hidden">
+<div class="learning-title">学习模式</div>
+<p>学习结构化问题分析的方法和思维过程。</p>
+<div class="learning-menu" id="learningMenu"></div>
+<div id="learningContent" class="learning-content">请选择学习内容。</div>
+</div>
+</details>
+
+<div id="analysisArea">
+<details class="example"><summary>选择案例</summary><div id="caseButtons"></div></details>
+<details id="inputArea" open>
+<summary>开始问题分析</summary>
+<div class="progress-container">
+<div class="progress-bar"><div id="progressFill" class="progress-fill"></div></div>
+<div id="progressText" class="progress-text">完成度：0%（0/0）</div>
+</div>
+<div id="stepsContainer"></div>
+</details>
+<div class="export-buttons">
+<button onclick="app.generateReport()">生成分析报告</button>
+<button onclick="app.editAgain()">修改分析</button>
+<button onclick="app.clearAll()" class="danger">清空所有</button>
+</div>
+<details id="reportArea"><summary>查看分析报告</summary><div id="result" class="report"></div></details>
+</div>
+</div>
+
+<script>
+// ========================================================================
+// v1.7.5 - 修复切换模式折叠面板数据丢失
+// ========================================================================
+
+// ============================================================
+// 暗色主题CSS（精简版，按需注入）
+// ============================================================
+
+const DARK_THEME_CSS = `
+body.dark-mode,
+.dark-mode .container,
+.dark-mode summary,
+.dark-mode .node,
+.dark-mode .step,
+.dark-mode textarea,
+.dark-mode select,
+.dark-mode .collapsible-section,
+.dark-mode .progress-container,
+.dark-mode .learning-panel,
+.dark-mode .learning-content,
+.dark-mode .report,
+.dark-mode .report-summary{background:#1a1a2e}
+.dark-mode .container,
+.dark-mode .node,
+.dark-mode .step,
+.dark-mode textarea,
+.dark-mode select,
+.dark-mode .collapsible-section,
+.dark-mode .progress-container,
+.dark-mode .learning-menu button,
+.dark-mode .report,
+.dark-mode .report-summary{border-color:#3a5a7a}
+.dark-mode summary,
+.dark-mode .node,
+.dark-mode .step,
+.dark-mode textarea,
+.dark-mode select,
+.dark-mode .collapsible-section summary,
+.dark-mode .learning-content,
+.dark-mode .quote,
+.dark-mode .mode label,
+.dark-mode .work-mode label,
+.dark-mode .report-summary-grid .item .value{color:#e0e0e0}
+.dark-mode summary,
+.dark-mode .collapsible-section summary{background:#2a3a5e}
+.dark-mode summary:hover,
+.dark-mode .collapsible-section summary:hover{background:#3a4a6e}
+.dark-mode textarea::placeholder{color:#8899aa}
+.dark-mode select option{background:#1a2a4a;color:#e0e0e0}
+.dark-mode #typeInfo,
+.dark-mode .collapsible-section .info-box b,
+.dark-mode .progress-text,
+.dark-mode .version-badge{color:#aab8c8}
+.dark-mode .arrow,
+.dark-mode .learning-title,
+.dark-mode .report-summary-title{color:#4a90e2}
+.dark-mode .learning-title,
+.dark-mode .learning-menu button{color:#7ab7ff}
+.dark-mode .learning-menu button{background:#1a2a4a;border-color:#4a90e2}
+.dark-mode .learning-menu button:hover{background:#2a3a5e}
+.dark-mode .example,
+.dark-mode .learning-example,
+.dark-mode .quote{background:#2a2a1a}
+.dark-mode .progress-bar{background:#2a3a5e}
+.dark-mode .theme-toggle{background:#f39c12;color:#1a1a2e}
+.dark-mode button:not(.danger):not(.success):not(.theme-toggle){background:#4a6a9a}
+.dark-mode button:not(.danger):not(.success):not(.theme-toggle):hover{background:#3a5a8a}
+.dark-mode .report-summary .label{color:#7ab7ff}
+.dark-mode .report-summary .value{color:#e8ecf0;background:#2a3a5e}
+`;
+
+// ============================================================
+// 配置中心
+// ============================================================
+
+const CONFIG = {
+  version:'v1.7.5',
+  optionMap:{
+    'pro2child':{'已验证':'非常可靠','可靠来源':'比较可靠','个人描述':'别人说的','未确认':'不太确定','推测':'猜的','明确问题':'答案明确的问题','复杂问题':'比较复杂的问题','开放问题':'开放性的问题'},
+    'child2pro':{'非常可靠':'已验证','比较可靠':'可靠来源','别人说的':'个人描述','不太确定':'未确认','猜的':'推测','答案明确的问题':'明确问题','比较复杂的问题':'复杂问题','开放性的问题':'开放问题'}
+  },
+  steps:{
+    pro:[
+      {id:'type',label:'问题类型判断',placeholder:'请选择问题类型'},
+      {id:'credibility',label:'信息可信度分析',placeholder:'请选择信息来源的可信度'},
+      {id:'problem',label:'问题重新定义',placeholder:'表面问题是什么？真正目标是什么？'},
+      {id:'split',label:'变量拆分与信息分类',placeholder:'哪些因素影响结果？',hasCollapse:true,fields:[
+        {id:'fact',label:'已确认事实',placeholder:'已经发生，可以观察或证明的信息'},
+        {id:'assumption',label:'可能假设',placeholder:'可能原因，但还没有证据'},
+        {id:'unknown',label:'未知信息',placeholder:'还需要进一步了解的信息'}
+      ]},
+      {id:'model',label:'建立模型',placeholder:'例如：现象 → 原因 → 影响 → 验证 → 方案'},
+      {id:'verify',label:'验证模型',placeholder:'如何判断分析是否正确？'},
+      {id:'solve',label:'执行方案',placeholder:'下一步具体行动'},
+      {id:'check',label:'反馈优化',placeholder:'根据结果如何调整？'}
+    ],
+    child:[
+      {id:'type',label:'这是什么类型的问题？',placeholder:'请选择问题类型',options:['答案明确的问题','比较复杂的问题','开放性的问题']},
+      {id:'credibility',label:'这个信息可靠吗？',placeholder:'请选择信息来源的可信度',options:['非常可靠','比较可靠','别人说的','不太确定','猜的']},
+      {id:'problem',label:'真正想解决什么？',placeholder:'表面问题是什么？真正目标是什么？'},
+      {id:'split',label:'拆解问题和分类信息',placeholder:'哪些因素影响结果？',hasCollapse:true,fields:[
+        {id:'fact',label:'哪些是真的？',placeholder:'已经发生，可以观察或证明的信息'},
+        {id:'assumption',label:'哪些只是猜测？',placeholder:'可能原因，但还没有证据'},
+        {id:'unknown',label:'还不知道什么？',placeholder:'还需要进一步了解的信息'}
+      ]},
+      {id:'model',label:'可以想什么办法？',placeholder:'例如：现象 → 原因 → 影响 → 验证 → 方案'},
+      {id:'verify',label:'怎么知道办法有效？',placeholder:'如何判断分析是否正确？'},
+      {id:'solve',label:'下一步怎么做？',placeholder:'下一步具体行动'},
+      {id:'check',label:'如何改进？',placeholder:'根据结果如何调整？'}
+    ]
+  },
+  typeDescriptions:{
+    '明确问题':'条件和目标明确，通常存在较确定答案，例如数学计算。',
+    '复杂问题':'影响因素较多，需要分析变量、关系和反馈过程。',
+    '开放问题':'没有唯一答案，需要比较不同方案的优缺点。',
+    '答案明确的问题':'条件和目标明确，通常有确定的答案，比如数学题。',
+    '比较复杂的问题':'涉及很多因素，需要仔细分析各种关系。',
+    '开放性的问题':'没有标准答案，需要比较不同选择的优缺点。'
+  },
+  prompts:{
+    '明确问题':{problem:'例如：目标是什么？已知条件有哪些？',split:'例如：已知量、未知量、关系式是什么？',model:'例如：条件→公式→计算→验证'},
+    '复杂问题':{problem:'例如：表面现象是什么？真正需要解决的问题是什么？',split:'例如：影响因素有哪些？哪些变量可以控制？',model:'例如：原因→影响→验证→方案'},
+    '开放问题':{problem:'例如：评价目标是什么？有哪些选择？',split:'例如：成本、收益、风险、限制条件有哪些？',model:'例如：目标→方案→比较→选择'},
+    '答案明确的问题':{problem:'例如：要解决什么？已经知道什么？',split:'例如：知道什么？不知道什么？有什么关系？',model:'例如：条件→公式→计算→检查'},
+    '比较复杂的问题':{problem:'例如：看到什么现象？真正要解决什么？',split:'例如：有哪些影响因素？哪些可以控制？',model:'例如：原因→影响→验证→方案'},
+    '开放性的问题':{problem:'例如：要选什么？有哪些选择？',split:'例如：价格、效果、风险、限制有哪些？',model:'例如：目标→方案→比较→选择'}
+  },
+  cases:{
+    math:{label:'数学问题',credibility:'已验证',type:'明确问题',problem:'求长方形的长和宽，已知面积为60，长比宽多4',split:'面积、长度关系、未知量',fact:'面积=60，长=宽+4',assumption:'可以建立一元二次方程求解',unknown:'具体解方程过程',model:'x(x+4)=60 → x²+4x-60=0',verify:'代入原条件验证：5×9=45❌，6×10=60✅',solve:'解方程得宽=6，长=10',check:'检查是否满足所有条件，验证答案'},
+    engineering:{label:'工程问题',credibility:'可靠来源',type:'复杂问题',problem:'设计低成本商场客流统计系统，限制预算5万元',split:'成本、准确率、隐私保护、算力需求',fact:'商场面积5000㎡，日均客流约3000人，已有监控摄像头',assumption:'视觉算法可复用现有摄像头，准确率可达90%',unknown:'不同光照/遮挡环境下实际准确率',model:'视频流→人脸检测→跟踪→计数→去重',verify:'实地测试2000人次，对比人工计数验证',solve:'选择YOLOv5轻量版，部署在边缘计算设备',check:'上线后持续监测准确率，每季度校准一次'},
+    science:{label:'科学研究',credibility:'未确认',type:'复杂问题',problem:'寻找导致两批相同品种植物生长差异的主要原因',split:'光照时长、浇水量、温度、土壤成分',fact:'A批平均高度25cm，B批15cm，同品种同批次种子',assumption:'光照差异可能是主因，B批光照时间短2小时/天',unknown:'土壤pH值、微量元素含量差异',model:'控制变量实验：固定光照/浇水/温度，对照土壤差异',verify:'重复3轮实验，每轮8周',solve:'设计4组对照实验，分别调整不同变量',check:'分析数据，确定主要因素'},
+    life:{label:'生活决策',credibility:'可靠来源',type:'开放问题',problem:'预算5000元，选择适合摄影爱好者的手机',split:'价格、摄像性能、处理器性能、电池寿命',fact:'预算5000元，优先拍照质量，日常使用流畅',assumption:'小米13Ultra或iPhone13Pro可能符合需求',unknown:'长期使用体验和系统更新支持',model:'需求权重评分：拍照40%+性能30%+续航20%+价格10%',verify:'参考专业评测、实体店体验对比',solve:'选择评分最高型号购买',check:'使用1个月后重新评估是否满足需求'},
+    psychology:{label:'心理问题',credibility:'个人描述',type:'复杂问题',problem:'理解考试前持续焦虑的产生原因和缓解方法',split:'压力事件、个人经历、性格特质、环境因素',fact:'每次重要考试前1周开始失眠、注意力不集中',assumption:'可能与过去考试失败经历有关',unknown:'是否存在完美主义倾向或认知偏差',model:'事件→认知解读→情绪反应→行为表现→反馈循环',verify:'通过认知行为日记记录2周，观察规律',solve:'调整认知方式：将"必须完美"改为"尽力就好"',check:'持续追踪焦虑水平变化，必要时寻求专业帮助'}
+  },
+  learningModules:{
+    problem:{title:'什么是结构化思考？',content:'<p>结构化思考是把复杂问题拆分成清晰步骤的方法。</p><div class="learning-example"><b>问题：</b>为什么手机使用体验下降？<br><br><b>分析：</b>现象 → 原因 → 验证 → 方案</div>'},
+    define:{title:'如何重新定义问题？',content:'<p>不要只解决表面现象，需要找到真正目标。</p><div class="learning-example"><b>表面问题：</b>手机变卡。<br><br><b>重新定义：</b>如何恢复正常使用体验？</div>'},
+    variable:{title:'如何拆分变量并分类信息？',content:'<p>复杂问题由多个因素共同影响，需要同时拆分变量和分类信息。</p><div class="learning-example"><b>手机续航下降：</b><br><b>变量拆分：</b>电池健康度、后台程序、使用习惯、系统设置<br><br><b>事实：</b>一天充两次电<br><b>假设：</b>电池老化<br><b>未知：</b>是否还有其他耗电因素</div>'},
+    fact:{title:'事实、假设与未知',content:'<p>分析时需要区分不同信息类型，它们共同构成完整的问题图景。</p><div class="learning-example"><b>事实：</b>手机一天需要充两次电。<br><br><b>假设：</b>电池可能老化。<br><br><b>未知：</b>是否存在其他耗电因素。</div>'},
+    model:{title:'如何建立模型？',content:'<p>模型用于描述问题因素之间的关系。</p><div class="learning-example">现象 → 原因 → 验证 → 方案</div>'},
+    verify:{title:'如何验证方案？',content:'<p>分析结果需要通过实际反馈验证。</p><div class="learning-example"><b>方案：</b>关闭后台程序。<br><br><b>验证：</b>观察耗电变化。</div>'}
+  },
+  mindmaps:{
+    child:['这是什么问题？','信息可靠吗？','重新定义问题','拆分变量<br>分类信息','建立模型<br>找办法','验证方案<br>有效吗？','执行方案','改进优化'],
+    pro:['问题类型判断','信息验证','重新定义问题','变量拆分<br>信息分类','建立模型','验证模型','执行方案','反馈优化']
+  }
+};
+
+// ============================================================
+// 应用核心
+// ============================================================
+
+const app = {
+  state:{mode:'pro',workMode:'analysis',data:{},theme:'light',_initialized:false},
+  toast(msg,type='info'){
+    const el=document.getElementById('toast');
+    el.textContent=msg;
+    el.className='toast show '+type;
+    clearTimeout(this._toastTimer);
+    this._toastTimer=setTimeout(()=>el.className='toast',1500);
+  },
+  toggleTheme(){
+    if(!document.getElementById('darkThemeStyle')){
+      const style=document.createElement('style');
+      style.id='darkThemeStyle';
+      style.textContent=DARK_THEME_CSS;
+      document.head.appendChild(style);
+    }
+    this.state.theme=this.state.theme==='light'?'dark':'light';
+    document.body.classList.toggle('dark-mode',this.state.theme==='dark');
+    this.toast('已切换至'+(this.state.theme==='dark'?'暗色':'亮色')+'主题','success');
+  },
+  init(){
+    if(this._initialized)return;
+    document.querySelector('input[name="mode"][value="pro"]').checked=true;
+    document.querySelector('input[name="workMode"][value="analysis"]').checked=true;
+    this.switchWorkMode('analysis');
+    this.renderAll();
+    this._initialized=true;
+  },
+  renderAll(){
+    this.renderSteps();
+    this.renderMindmap();
+    this.renderCases();
+    this.renderLearningMenu();
+  },
+  getAllFieldIds(){
+    const steps=CONFIG.steps[this.state.mode]||CONFIG.steps.pro,ids=[];
+    for(let i=0;i<steps.length;i++){const s=steps[i];ids.push(s.id);if(s.hasCollapse&&s.fields){for(let j=0;j<s.fields.length;j++)ids.push(s.fields[j].id);}}
+    return ids;
+  },
+  updateProgress(){
+    const data=this.state.data,ids=this.getAllFieldIds();
+    let filled=0;
+    for(let i=0;i<ids.length;i++){const v=data[ids[i]];if(v&&v.trim()!=='')filled++;}
+    const total=ids.length,percent=total>0?Math.round(filled/total*100):0;
+    const fill=document.getElementById('progressFill'),text=document.getElementById('progressText');
+    if(fill){fill.style.width=percent+'%';fill.style.background=percent<30?'#e74c3c':percent<60?'#f39c12':percent<90?'#4a90e2':'#27ae60';}
+    if(text)text.textContent='完成度：'+percent+'%（'+filled+'/'+total+'）';
+    return {percent,filled,total};
+  },
+  setField(id,value){
+    this.state.data[id]=value;
+    const el=document.getElementById(id);if(el)el.value=value;
+    if(id==='type'){this.updateTypeInfo(value);this.updatePrompts(value);}
+    this.updateProgress();
+  },
+  setData(data){
+    this.state.data={...data};
+    this.renderSteps();
+    if(data.type){this.updateTypeInfo(data.type);this.updatePrompts(data.type);}
+    this.updateProgress();
+  },
+  mapOptionValue(value,fromMode,toMode){
+    if(!value||value.trim()==='')return'';
+    const key=fromMode==='pro'&&toMode==='child'?'pro2child':fromMode==='child'&&toMode==='pro'?'child2pro':null;
+    return key&&CONFIG.optionMap[key][value]?CONFIG.optionMap[key][value]:value;
+  },
+  switchMode(mode){
+    // 保存旧数据（包含所有子字段）
+    const oldData={...this.state.data};
+    const oldMode=this.state.mode;
+    this.state.mode=mode;
+    // 重新渲染步骤
+    this.renderSteps();
+    // 恢复数据（包含所有子字段）
+    const newData={};
+    const steps=CONFIG.steps[mode]||CONFIG.steps.pro;
+    for(let i=0;i<steps.length;i++){
+      const s=steps[i];
+      // 恢复顶层字段
+      if(oldData[s.id]!==undefined){
+        if(s.id==='credibility'||s.id==='type'){
+          newData[s.id]=this.mapOptionValue(oldData[s.id],oldMode,mode);
+        }else{
+          newData[s.id]=oldData[s.id];
+        }
+      }
+      // 恢复折叠面板子字段
+      if(s.hasCollapse&&s.fields){
+        for(let j=0;j<s.fields.length;j++){
+          const f=s.fields[j];
+          if(oldData[f.id]!==undefined){
+            newData[f.id]=oldData[f.id];
+          }
+        }
+      }
+    }
+    // 应用恢复的数据
+    this.state.data={...newData};
+    // 同步DOM
+    for(let key in newData){
+      const el=document.getElementById(key);
+      if(el)el.value=newData[key];
+    }
+    this.renderMindmap();
+    if(newData.type){this.updateTypeInfo(newData.type);this.updatePrompts(newData.type);}
+    this.updateProgress();
+  },
+  switchWorkMode(mode){
+    this.state.workMode=mode;
+    const a=document.getElementById('analysisArea'),am=document.getElementById('analysisMode'),lm=document.getElementById('learningMode');
+    if(mode==='analysis'){a.classList.remove('hidden');am.classList.remove('hidden');lm.classList.add('hidden');}
+    else{a.classList.add('hidden');am.classList.add('hidden');lm.classList.remove('hidden');}
+  },
+  renderSteps(){
+    const container=document.getElementById('stepsContainer');
+    const steps=CONFIG.steps[this.state.mode]||CONFIG.steps.pro,data=this.state.data;
+    let html='';
+    for(let i=0;i<steps.length;i++){
+      const s=steps[i],val=data[s.id]||'';
+      if(s.hasCollapse&&s.fields){
+        let fHtml='';
+        for(let j=0;j<s.fields.length;j++){const f=s.fields[j];fHtml+='<b>'+f.label+'</b><textarea id="'+f.id+'" placeholder="'+f.placeholder+'">'+(data[f.id]||'')+'</textarea>';}
+        html+='<div class="step" data-step="'+s.id+'"><span class="title">'+(i+1)+'. '+s.label+'</span><textarea id="'+s.id+'" placeholder="'+s.placeholder+'">'+val+'</textarea><details class="collapsible-section"><summary>📋 信息分类（点击展开/收起）</summary><div class="info-box">'+fHtml+'</div></details></div>';
+      }else if(s.id==='credibility'||s.id==='type'){
+        const opts=s.options||(s.id==='credibility'?['已验证','可靠来源','个人描述','未确认','推测']:['明确问题','复杂问题','开放问题']);
+        const hasVal=val&&val.trim()!=='';
+        let optHtml='';
+        for(let j=0;j<opts.length;j++){const o=opts[j];optHtml+='<option value="'+o+'"'+(val===o?' selected':'')+'>'+o+'</option>';}
+        html+='<div class="step" data-step="'+s.id+'"><span class="title">'+(i+1)+'. '+s.label+'</span><select id="'+s.id+'" onchange="app.handleSelectChange(\''+s.id+'\')"><option value="" disabled'+(hasVal?'':' selected')+'>请选择'+s.label+'</option>'+optHtml+'</select>'+(s.id==='type'?'<div id="typeInfo"></div>':'')+'</div>';
+      }else{
+        html+='<div class="step" data-step="'+s.id+'"><span class="title">'+(i+1)+'. '+s.label+'</span><textarea id="'+s.id+'" placeholder="'+s.placeholder+'">'+val+'</textarea></div>';
+      }
+    }
+    container.innerHTML=html;
+    if(data.type)this.updateTypeInfo(data.type);
+    this.updateProgress();
+  },
+  renderMindmap(){
+    const container=document.getElementById('mindmap');
+    const nodes=CONFIG.mindmaps[this.state.mode]||CONFIG.mindmaps.pro;
+    let html='';
+    for(let i=0;i<nodes.length;i++){html+='<div class="node">'+nodes[i]+'</div>'+(i<nodes.length-1?'<div class="arrow">↓</div>':'');}
+    container.innerHTML=html;
+  },
+  renderCases(){
+    const container=document.getElementById('caseButtons');
+    const entries=Object.entries(CONFIG.cases);
+    let html='';
+    for(let i=0;i<entries.length;i++){const kv=entries[i];html+='<button onclick="app.loadCase(\''+kv[0]+'\')">'+kv[1].label+'</button>';}
+    container.innerHTML=html;
+  },
+  renderLearningMenu(){
+    const container=document.getElementById('learningMenu');
+    const entries=Object.entries(CONFIG.learningModules);
+    let html='';
+    for(let i=0;i<entries.length;i++){const kv=entries[i];html+='<button onclick="app.loadLearning(\''+kv[0]+'\')">'+kv[1].title+'</button>';}
+    container.innerHTML=html;
+  },
+  handleSelectChange(id){const el=document.getElementById(id);if(el)this.setField(id,el.value);},
+  updateTypeInfo(type){const el=document.getElementById('typeInfo');if(el)el.textContent=CONFIG.typeDescriptions[type]||'';},
+  updatePrompts(type){
+    const p=CONFIG.prompts[type];if(!p)return;
+    const keys=['problem','split','model'];
+    for(let i=0;i<keys.length;i++){const k=keys[i];const el=document.getElementById(k);if(el&&p[k])el.placeholder=p[k];}
+  },
+  loadCase(name){
+    const d=CONFIG.cases[name];if(!d){this.toast('案例不存在','error');return;}
+    this.setData(d);this.toast('已加载案例：'+d.label,'success');document.getElementById('inputArea').open=true;
+  },
+  loadLearning(name){
+    const d=CONFIG.learningModules[name];if(!d){this.toast('学习内容不存在','error');return;}
+    document.getElementById('learningContent').innerHTML='<h3>'+d.title+'</h3>'+d.content;
+    this.toast('已加载：'+d.title,'success');
+  },
+  generateReport(){
+    const data=this.state.data,steps=CONFIG.steps[this.state.mode]||CONFIG.steps.pro;
+    const progress=this.updateProgress();
+    const type=data.type||'未选择';
+    const credibility=data.credibility||'未选择';
+    const overview=data.problem?(data.problem.length>30?data.problem.substring(0,30)+'...':data.problem):'未填写';
+    const solve=data.solve||'',check=data.check||'';
+    let coreAdvice='未填写';
+    if(solve&&check)coreAdvice=solve+'；'+check;
+    else if(solve)coreAdvice=solve;
+    else if(check)coreAdvice=check;
+    let html='<div class="report-summary"><div class="report-summary-title">📊 分析摘要</div><div class="report-summary-grid">';
+    html+='<div class="item"><span class="label">问题类型</span><span class="value">'+app.escapeHTML(type)+'</span></div>';
+    html+='<div class="item"><span class="label">信息来源</span><span class="value">'+app.escapeHTML(credibility)+'</span></div>';
+    html+='<div class="item"><span class="label">完成度</span><span class="value">'+progress.percent+'%（'+progress.filled+'/'+progress.total+'步）</span></div>';
+    html+='<div class="item"><span class="label">问题概述</span><span class="value">'+app.escapeHTML(overview)+'</span></div>';
+    html+='<div class="item full"><span class="label">核心建议</span><span class="value">'+app.escapeHTML(coreAdvice)+'</span></div></div></div>';
+    for(let i=0;i<steps.length;i++){
+      const s=steps[i];let val=data[s.id]||'未填写';
+      if(s.hasCollapse&&s.fields){
+        let sub='';
+        for(let j=0;j<s.fields.length;j++){const f=s.fields[j];const sv=data[f.id]||'未填写';sub+='<div style="margin-top:4px;padding-left:12px;border-left:2px solid #d8c08a;"><b style="font-size:13px;color:#555;">'+f.label+'：</b><span style="font-weight:400;">'+app.escapeHTML(sv)+'</span></div>';}
+        html+='<div class="report-item"><span>【'+s.label+'】</span><div class="quote"><div style="font-weight:700;margin-bottom:6px;">变量拆分：</div><div style="font-weight:400;margin-bottom:8px;">'+app.escapeHTML(val)+'</div><div style="font-weight:700;margin-bottom:4px;">📋 信息分类：</div>'+sub+'</div></div>';
+      }else{
+        html+='<div class="report-item"><span>【'+s.label+'】</span><div class="quote">'+app.escapeHTML(val)+'</div></div>';
+      }
+    }
+    document.getElementById('result').innerHTML=html;
+    document.getElementById('inputArea').open=false;
+    document.getElementById('reportArea').open=true;
+    document.getElementById('reportArea').scrollIntoView({behavior:'smooth'});
+    this.toast('报告已生成','success');
+  },
+  editAgain(){
+    document.getElementById('reportArea').open=false;
+    document.getElementById('inputArea').open=true;
+    document.getElementById('inputArea').scrollIntoView({behavior:'smooth'});
+  },
+  clearAll(){
+    if(!confirm('确定要清空所有数据吗？'))return;
+    this.state.data={};this.renderSteps();
+    document.getElementById('result').innerHTML='';
+    document.getElementById('typeInfo').textContent='';
+    this.updateProgress();
+    document.getElementById('reportArea').open=false;
+    document.getElementById('inputArea').open=true;
+    this.toast('已清空所有数据','success');
+  },
+  escapeHTML(t){return String(t||'未填写').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');}
+};
+
+// ============================================================
+// 启动 & 全局事件
+// ============================================================
+
+document.addEventListener('DOMContentLoaded',function(){app.init();});
+
+document.addEventListener('input',function(e){
+  if((e.target.tagName==='TEXTAREA'||e.target.tagName==='INPUT')&&e.target.id&&window.app){
+    window.app.state.data[e.target.id]=e.target.value;
+    window.app.updateProgress();
+  }
+});
+document.addEventListener('change',function(e){
+  if(e.target.tagName==='SELECT'&&e.target.id&&window.app){
+    window.app.handleSelectChange(e.target.id);
+  }
+});
+
+window.app=app;
+</script>
+</body>
+</html>
