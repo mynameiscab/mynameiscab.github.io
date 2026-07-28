@@ -13,14 +13,14 @@
     <h1 class="page-title">欢迎来到中转站</h1>
     <h2 class="page-title">请选择您的目的地</h2>
 
-    <h3 class="category-title" data-target="tool-list">📁 在线工具</h3>
+    <h3 class="category-title" data-target="tool-list">在线工具</h3>
     <ul class="link-list" id="tool-list">
       <li class="link-item"><a href="./otherhtml/duckRunner/duckRunner.html" target="_blank" rel="noopener noreferrer" title="鸭子赛跑工具">鸭子赛跑</a></li>
       <li class="link-item"><a href="./otherhtml/randName/randName.html" target="_blank" rel="noopener noreferrer" title="随机点名工具">随机点名</a></li>
       <li class="link-item"><a href="./otherhtml/solveProblem/solveProblem.html" target="_blank" rel="noopener noreferrer" title="结构化问题分析训练器">结构化问题分析训练器</a></li>
     </ul>
 
-    <h3 class="category-title" data-target="game-list">📁 在线游戏</h3>
+    <h3 class="category-title" data-target="game-list">在线游戏</h3>
     <ul class="link-list" id="game-list">
       <li class="link-item"><a href="./otherhtml/SweepBOON/SweepBOON.html" target="_blank" rel="noopener noreferrer" title="扫雷小游戏">扫雷</a></li>
       <li class="link-item"><a href="./otherhtml/RUSblock/RUSblock.html" target="_blank" rel="noopener noreferrer" title="俄罗斯方块小游戏">俄罗斯方块</a></li>
@@ -28,23 +28,23 @@
       <li class="link-item"><a href="./otherhtml/fivechess/fivechess.html" target="_blank" rel="noopener noreferrer" title="五子棋小游戏">五子棋</a></li>
     </ul>
 
-    <h3 class="category-title" data-target="map-list">📁 地图</h3>
+    <h3 class="category-title" data-target="map-list">地图</h3>
     <ul class="link-list" id="map-list">
       <li class="link-item"><a href="https://www.airpano.org.cn/" target="_blank" rel="noopener noreferrer" title="AirPano环游世界">环游世界</a></li>
     </ul>
 
-    <h3 class="category-title" data-target="security-list">📁 安全</h3>
+    <h3 class="category-title" data-target="security-list">安全</h3>
     <ul class="link-list" id="security-list">
       <li class="link-item"><a href="https://urlsec.qq.com/index.html" target="_blank" rel="noopener noreferrer" title="腾讯安全-网址安全中心">腾讯安全-网址安全中心</a></li>
       <li class="link-item"><a href="https://urlsec.qq.com/check.html" target="_blank" rel="noopener noreferrer" title="腾讯安全-网址安全检测">腾讯安全-网址安全检测</a></li>
     </ul>
 
-    <h3 class="category-title" data-target="other-list">📁 其他</h3>
+    <h3 class="category-title" data-target="other-list">其他</h3>
     <ul class="link-list" id="other-list">
       <li class="link-item"><a href="http://caixb.ysepan.com/" target="_blank" rel="noopener noreferrer" title="欢迎访问">Welcome</a></li>
     </ul>
 
-    <h3 class="category-title" data-target="bookmark-list">📁 网站收藏</h3>
+    <h3 class="category-title" data-target="bookmark-list">网站收藏</h3>
     <ul class="link-list" id="bookmark-list">
       <li class="link-item"><a href="http://www.archive.org" target="_blank" rel="noopener noreferrer" title="互联网档案馆（Wayback Machine）">互联网档案馆</a></li>
     </ul>
@@ -67,13 +67,17 @@
 
       // 初始状态：全部折叠
       list.style.display = 'none';
-      title.textContent = '▶ ' + title.textContent.replace(/^[📁▶]\s*/, '');
+      // 标题前加 [展开] 提示（折叠状态）
+      title.textContent = '[展开] ' + title.textContent;
 
       title.addEventListener('click', function() {
         expanded = !expanded;
         list.style.display = expanded ? '' : 'none';
-        const icon = expanded ? '📁 ' : '▶ ';
-        this.textContent = icon + this.textContent.replace(/^[📁▶]\s*/, '');
+        if (expanded) {
+          this.textContent = this.textContent.replace('[展开] ', '[收起] ');
+        } else {
+          this.textContent = this.textContent.replace('[收起] ', '[展开] ');
+        }
       });
     });
   </script>
