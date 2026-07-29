@@ -7,8 +7,8 @@
 
 :root {
     --body-bg-color: #646464;
-    --primary-accent: cyan;
-    --secondary-accent: yellow;
+    --primary-accent: rgba(8, 212, 209, 0.85);
+    --secondary-accent: rgba(85, 219, 153, 0.75);
     --text-color: #ffffff;
     --link-bg: #f0f0f0;
     --link-color: #000000;
@@ -70,7 +70,7 @@ main {
     background-blend-mode: overlay;
     /* 确保高光层级正确 */
     position: relative;
-    z-index: 1;
+    z-index: 2;
 }
 
 .page-title {
@@ -78,6 +78,7 @@ main {
     text-align: center;
     margin-bottom: var(--spacing-lg);
     font-size: clamp(1.5rem, 3vw, 1.8rem);
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
 .category-title {
@@ -124,6 +125,7 @@ footer {
     font-size: 1.2rem;
     padding-top: var(--spacing-md);
     border-top: 1px solid var(--primary-accent);
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
 @media (max-width: 768px) {
@@ -162,6 +164,7 @@ footer {
   transition: background 0.3s, color 0.3s;
   list-style: none;
   display: block;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
 .category-summary::-webkit-details-marker {
