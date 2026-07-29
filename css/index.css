@@ -7,8 +7,8 @@
 
 :root {
     --body-bg-color: #646464;
-    --primary-accent: rgba(8, 212, 209, 0.85);
-    --secondary-accent: rgba(85, 219, 153, 0.75);
+    --primary-accent: rgba(255, 255, 255, 0.85);
+    --secondary-accent: rgba(255, 255, 255, 0.75);
     --text-color: #ffffff;
     --link-bg: #f0f0f0;
     --link-color: #000000;
